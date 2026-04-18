@@ -28,8 +28,29 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error(`Failed to load ${src}`));
-    img.src = src;
+    img.src = withBase(src);
   });
+}
+
+/** Prepend Vite's BASE_URL to absolute-rooted asset paths so they resolve
+ *  correctly when the site is hosted at `https://user.github.io/repo/`.
+ *  Leaves data:, blob:, http(s):, and synthetic:// URLs alone. */
+function withBase(src: string): string {
+  if (
+    src.startsWith('http://') ||
+    src.startsWith('https://') ||
+    src.startsWith('data:') ||
+    src.startsWith('blob:') ||
+    src.startsWith('synthetic://')
+  ) {
+    return src;
+  }
+  const base = import.meta.env.BASE_URL || '/';
+  // Trim leading slash off src so we don't end up with "//".
+  const trimmed = src.startsWith('/') ? src.slice(1) : src;
+  // Trim trailing slash off base for clean concat.
+  const cleanBase = base.endsWith('/') ? base : `${base}/`;
+  return `${cleanBase}${trimmed}`;
 }
 
 function flipHorizontal(img: HTMLImageElement): HTMLCanvasElement {

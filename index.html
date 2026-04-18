@@ -7,7 +7,9 @@
     <style>
       @font-face {
         font-family: 'PixelSans';
-        src: url('/fonts/FSPixelSansUnicode-Regular.ttf') format('truetype');
+        /* Relative URL so the font resolves correctly whether the site is
+           served from the repo root or a subfolder (GitHub Pages). */
+        src: url('./fonts/FSPixelSansUnicode-Regular.ttf') format('truetype');
         font-weight: 400;
         font-style: normal;
         font-display: block;
