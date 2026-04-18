@@ -1,0 +1,147 @@
+import type { FurnitureDef } from '../engine/types';
+
+/**
+ * Hand-curated catalog of furniture used in the pizzeria.
+ * Sprites are loaded directly from /furniture/<FOLDER>/<FILE>.png.
+ */
+const CATALOG: Record<string, FurnitureDef> = {
+  TABLE_FRONT: {
+    id: 'TABLE_FRONT',
+    src: '/furniture/TABLE_FRONT/TABLE_FRONT.png',
+    w: 48,
+    h: 64,
+    footprintW: 3,
+    footprintH: 4,
+    backgroundTiles: 1,
+  },
+  SMALL_TABLE_FRONT: {
+    id: 'SMALL_TABLE_FRONT',
+    src: '/furniture/SMALL_TABLE/SMALL_TABLE_FRONT.png',
+    w: 32,
+    h: 32,
+    footprintW: 2,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  WOODEN_CHAIR_FRONT: {
+    id: 'WOODEN_CHAIR_FRONT',
+    src: '/furniture/WOODEN_CHAIR/WOODEN_CHAIR_FRONT.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  WOODEN_CHAIR_BACK: {
+    id: 'WOODEN_CHAIR_BACK',
+    src: '/furniture/WOODEN_CHAIR/WOODEN_CHAIR_BACK.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  WOODEN_CHAIR_SIDE: {
+    id: 'WOODEN_CHAIR_SIDE',
+    src: '/furniture/WOODEN_CHAIR/WOODEN_CHAIR_SIDE.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  CUSHIONED_CHAIR_FRONT: {
+    id: 'CUSHIONED_CHAIR_FRONT',
+    src: '/furniture/CUSHIONED_CHAIR/CUSHIONED_CHAIR_FRONT.png',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+  },
+  CUSHIONED_CHAIR_BACK: {
+    id: 'CUSHIONED_CHAIR_BACK',
+    src: '/furniture/CUSHIONED_CHAIR/CUSHIONED_CHAIR_BACK.png',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+  },
+  PC_FRONT: {
+    id: 'PC_FRONT',
+    src: '/furniture/PC/PC_FRONT_ON_1.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  PC_SIDE: {
+    id: 'PC_SIDE',
+    src: '/furniture/PC/PC_SIDE.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  WHITEBOARD: {
+    id: 'WHITEBOARD',
+    src: '/furniture/WHITEBOARD/WHITEBOARD.png',
+    w: 32,
+    h: 32,
+    footprintW: 2,
+    footprintH: 2,
+    backgroundTiles: 2,
+  },
+  PLANT: {
+    id: 'PLANT',
+    src: '/furniture/PLANT/PLANT.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  CACTUS: {
+    id: 'CACTUS',
+    src: '/furniture/CACTUS/CACTUS.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+  },
+  CLOCK: {
+    id: 'CLOCK',
+    src: '/furniture/CLOCK/CLOCK.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 2,
+  },
+  COFFEE: {
+    id: 'COFFEE',
+    src: '/furniture/COFFEE/COFFEE.png',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+  },
+  BIN: {
+    id: 'BIN',
+    src: '/furniture/BIN/BIN.png',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+  },
+};
+
+export function getFurnitureDef(id: string): FurnitureDef | undefined {
+  return CATALOG[id];
+}
+
+export function getAllFurnitureSrcs(): string[] {
+  return Object.values(CATALOG).map((d) => d.src);
+}

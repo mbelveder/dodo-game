@@ -1,0 +1,159 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { STATIONS, type Station } from './content/stations';
+import { showBubble } from './engine/character';
+import {
+  loadCharacterSheets,
+  loadFurnitureImages,
+  setAssetsReady,
+} from './engine/sprites';
+import { type GameState } from './engine/gameState';
+import { getAllFurnitureSrcs } from './scene/furnitureCatalog';
+import { buildPizzeriaState } from './scene/pizzeriaLayout';
+import { EndingStory } from './ui/EndingStory';
+import { GameCanvas } from './ui/GameCanvas';
+import { HUD } from './ui/HUD';
+import { InfographicModal } from './ui/InfographicModal';
+import { IntroCutscene } from './ui/IntroCutscene';
+import './ui/ui.css';
+
+type Stage = 'boot' | 'intro' | 'play' | 'ending';
+
+interface CompletedRecord {
+  stationId: string;
+  correct: boolean;
+  chosenIndex: number;
+}
+
+export default function App() {
+  const [stage, setStage] = useState<Stage>('boot');
+  const [openStation, setOpenStation] = useState<Station | null>(null);
+  const [completed, setCompleted] = useState<CompletedRecord[]>([]);
+  const [activePromptId, setActivePromptId] = useState<string | null>(null);
+  const [stateKey, setStateKey] = useState(0);
+
+  // Build pizzeria state once per game run; rebuilding bumps stateKey to remount canvas.
+  const gameState = useMemo<GameState>(() => buildPizzeriaState(), [stateKey]);
+
+  // Asset boot
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        await loadCharacterSheets();
+        await loadFurnitureImages(getAllFurnitureSrcs());
+        setAssetsReady();
+        if (!cancelled) setStage('intro');
+      } catch (err) {
+        console.error('Asset load failed', err);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const completedIds = useMemo(() => new Set(completed.map((c) => c.stationId)), [completed]);
+
+  // Mirror completed ids onto the engine state so the renderer can paint
+  // green rings/ticks on completed stations.
+  useEffect(() => {
+    gameState.completedStationIds = completedIds;
+  }, [gameState, completedIds]);
+
+  const currentPromptStation = activePromptId
+    ? STATIONS.find((s) => s.id === activePromptId)
+    : null;
+
+  const handleInteract = useCallback(
+    (id: string) => {
+      const station = STATIONS.find((s) => s.id === id);
+      if (!station) return;
+      if (completedIds.has(id)) {
+        showBubble(gameState.player, 'Тут я уже всё изучил.', 2.4);
+        return;
+      }
+      setOpenStation(station);
+    },
+    [completedIds, gameState.player],
+  );
+
+  const handleAnswer = useCallback(
+    (chosenIndex: number, correct: boolean) => {
+      if (!openStation) return;
+      setCompleted((prev) => [
+        ...prev,
+        { stationId: openStation.id, chosenIndex, correct },
+      ]);
+    },
+    [openStation],
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setOpenStation(null);
+    // Auto-advance to ending if all stations completed
+    setTimeout(() => {
+      setCompleted((latest) => {
+        if (latest.length >= STATIONS.length) {
+          setStage('ending');
+        }
+        return latest;
+      });
+    }, 0);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setCompleted([]);
+    setOpenStation(null);
+    setActivePromptId(null);
+    setStateKey((k) => k + 1);
+    setStage('intro');
+  }, []);
+
+  if (stage === 'boot') {
+    return (
+      <div className="bootScreen">
+        <div className="bootBrand">DODO</div>
+        <div className="bootStatus">Загрузка пиццерии…</div>
+      </div>
+    );
+  }
+
+  if (stage === 'intro') {
+    return <IntroCutscene onFinish={() => setStage('play')} />;
+  }
+
+  if (stage === 'ending') {
+    const score = completed.filter((c) => c.correct).length;
+    return <EndingStory score={score} total={STATIONS.length} onRestart={handleRestart} />;
+  }
+
+  return (
+    <div className="playScreen">
+      <GameCanvas
+        key={stateKey}
+        state={gameState}
+        onActivePromptChange={setActivePromptId}
+        onInteract={handleInteract}
+      />
+      <HUD
+        completed={completed.length}
+        total={STATIONS.length}
+        promptLabel={
+          currentPromptStation
+            ? completedIds.has(currentPromptStation.id)
+              ? `${currentPromptStation.label} (изучено)`
+              : currentPromptStation.label
+            : null
+        }
+      />
+      {openStation && (
+        <InfographicModal
+          station={openStation}
+          onAnswer={handleAnswer}
+          onClose={handleCloseModal}
+        />
+      )}
+    </div>
+  );
+}
