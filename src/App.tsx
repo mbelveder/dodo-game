@@ -3,12 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { STATIONS, type Station } from './content/stations';
 import { showBubble } from './engine/character';
 import {
+  buildSyntheticSprites,
   loadCharacterSheets,
   loadFurnitureImages,
   setAssetsReady,
 } from './engine/sprites';
 import { type GameState } from './engine/gameState';
-import { getAllFurnitureSrcs } from './scene/furnitureCatalog';
+import { getAllFurnitureRequests } from './scene/furnitureCatalog';
 import { buildPizzeriaState } from './scene/pizzeriaLayout';
 import { EndingStory } from './ui/EndingStory';
 import { GameCanvas } from './ui/GameCanvas';
@@ -41,7 +42,8 @@ export default function App() {
     (async () => {
       try {
         await loadCharacterSheets();
-        await loadFurnitureImages(getAllFurnitureSrcs());
+        buildSyntheticSprites();
+        await loadFurnitureImages(getAllFurnitureRequests());
         setAssetsReady();
         if (!cancelled) setStage('intro');
       } catch (err) {

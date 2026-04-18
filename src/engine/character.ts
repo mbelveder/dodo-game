@@ -39,14 +39,20 @@ export interface CreateCharacterOpts {
   wanders?: boolean;
   wanderRadius?: number;
   name?: string;
+  seated?: boolean;
+  hasBackpack?: boolean;
 }
 
 export function createCharacter(opts: CreateCharacterOpts): Character {
   const c = tileCenter(opts.col, opts.row);
+  // Seated diners run the "type" animation (alternating frames 3 and 4 in
+  // the spritesheet) which reads as gentle hand motion — the closest thing
+  // we have to an "eating at a table" pose without new sprites.
+  const initialState = opts.seated ? CharacterState.TYPE : CharacterState.IDLE;
   return {
     id: opts.id,
     paletteIndex: opts.paletteIndex,
-    state: CharacterState.IDLE,
+    state: initialState,
     dir: opts.dir ?? Direction.DOWN,
     x: c.x,
     y: c.y,
@@ -63,6 +69,8 @@ export function createCharacter(opts: CreateCharacterOpts): Character {
     bubble: null,
     isPlayer: opts.isPlayer ?? false,
     name: opts.name,
+    seated: opts.seated ?? false,
+    hasBackpack: opts.hasBackpack ?? false,
   };
 }
 

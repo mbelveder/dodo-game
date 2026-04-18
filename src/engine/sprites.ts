@@ -109,16 +109,154 @@ export function typeFrameIdx(frame: number): number {
 
 // ── Furniture ──────────────────────────────────────────────────
 
-export async function loadFurnitureImages(srcs: string[]): Promise<void> {
-  for (const src of srcs) {
-    if (furnitureImgs.has(src)) continue;
-    const img = await loadImage(src);
-    furnitureImgs.set(src, img);
+/** Anything drawImage accepts works as a furniture sprite; we mix loaded
+ *  PNGs with synthetic canvases (e.g. the procedural pizza). */
+export type FurnitureSprite = HTMLImageElement | HTMLCanvasElement;
+
+const furnitureCanvases = new Map<string, HTMLCanvasElement>();
+
+export interface FurnitureImageRequest {
+  src: string;
+  /** Optional post-load tint applied to every non-transparent pixel,
+   *  preserving lightness and alpha. Used to recolor stock sprites to
+   *  match the Dodo corporate palette. */
+  tint?: 'orange';
+}
+
+export async function loadFurnitureImages(
+  requests: Array<string | FurnitureImageRequest>,
+): Promise<void> {
+  for (const r of requests) {
+    const req: FurnitureImageRequest = typeof r === 'string' ? { src: r } : r;
+    if (furnitureImgs.has(req.src) || furnitureCanvases.has(req.src)) continue;
+    if (req.src.startsWith('synthetic://')) continue;
+    const img = await loadImage(req.src);
+    if (req.tint === 'orange') {
+      furnitureCanvases.set(req.src, tintImageOrange(img));
+    } else {
+      furnitureImgs.set(req.src, img);
+    }
   }
 }
 
-export function getFurnitureImage(src: string): HTMLImageElement | null {
-  return furnitureImgs.get(src) ?? null;
+/**
+ * Recolor every non-transparent pixel of an image to the corporate orange,
+ * preserving the original pixel's lightness and alpha. Effectively a "Hue"
+ * blend: we keep the shading detail of the original sprite but swap the hue.
+ */
+function tintImageOrange(img: HTMLImageElement): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = img.width;
+  c.height = img.height;
+  const ctx = c.getContext('2d');
+  if (!ctx) return c;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0);
+  const data = ctx.getImageData(0, 0, c.width, c.height);
+  const d = data.data;
+  // Target hue: Dodo orange #FF6900 → roughly H=24°, S=100%, L=50%.
+  // For each pixel, compute its lightness and rebuild as orange of the same L.
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] === 0) continue;
+    const r = d[i] / 255;
+    const g = d[i + 1] / 255;
+    const b = d[i + 2] / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const l = (max + min) / 2;
+    // Build orange-with-lightness-l using a simple ramp:
+    //   l=0   -> #000000
+    //   l=0.5 -> #FF6900
+    //   l=1   -> #FFFFFF
+    let outR: number;
+    let outG: number;
+    let outB: number;
+    if (l <= 0.5) {
+      const f = l / 0.5;
+      outR = 255 * f;
+      outG = 105 * f;
+      outB = 0;
+    } else {
+      const f = (l - 0.5) / 0.5;
+      outR = 255;
+      outG = 105 + (255 - 105) * f;
+      outB = 0 + 255 * f;
+    }
+    d[i] = Math.round(outR);
+    d[i + 1] = Math.round(outG);
+    d[i + 2] = Math.round(outB);
+  }
+  ctx.putImageData(data, 0, 0);
+  return c;
+}
+
+export function getFurnitureImage(src: string): FurnitureSprite | null {
+  return furnitureImgs.get(src) ?? furnitureCanvases.get(src) ?? null;
+}
+
+/** Register a procedurally-built canvas as a furniture sprite under `src`. */
+export function registerSyntheticSprite(src: string, canvas: HTMLCanvasElement): void {
+  furnitureCanvases.set(src, canvas);
+}
+
+/** Build the procedural pixel-art pizza sprite (32×16) — a wood board with
+ *  a cheesy pepperoni pizza on top. Idempotent. */
+export function buildSyntheticSprites(): void {
+  if (furnitureCanvases.has('synthetic://pizza')) return;
+  const c = document.createElement('canvas');
+  c.width = 32;
+  c.height = 16;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  // Board (wooden cutting board, oval-ish)
+  drawPixelOval(ctx, 16, 9, 14, 6, '#8b5a2b');
+  drawPixelOval(ctx, 16, 9, 14, 6, '#8b5a2b');
+  // Crust ring
+  drawPixelOval(ctx, 16, 8, 12, 5, '#c98a4b');
+  // Sauce
+  drawPixelOval(ctx, 16, 8, 10, 4, '#d83a2a');
+  // Cheese highlights (small yellow-cream blobs)
+  putPixel(ctx, 11, 7, '#ffe066');
+  putPixel(ctx, 13, 6, '#ffe066');
+  putPixel(ctx, 18, 6, '#ffe066');
+  putPixel(ctx, 21, 7, '#ffe066');
+  putPixel(ctx, 12, 9, '#ffe066');
+  putPixel(ctx, 19, 9, '#ffe066');
+  // Pepperoni dots (darker red)
+  putPixel(ctx, 10, 8, '#a31c14');
+  putPixel(ctx, 14, 7, '#a31c14');
+  putPixel(ctx, 17, 9, '#a31c14');
+  putPixel(ctx, 20, 7, '#a31c14');
+  putPixel(ctx, 22, 9, '#a31c14');
+  // Tiny basil leaves (green)
+  putPixel(ctx, 15, 9, '#4a8b3a');
+  putPixel(ctx, 19, 8, '#4a8b3a');
+  // Crust shadow on bottom edge
+  for (let x = 6; x <= 26; x++) putPixel(ctx, x, 12, '#5e3a18');
+  registerSyntheticSprite('synthetic://pizza', c);
+}
+
+function putPixel(ctx: CanvasRenderingContext2D, x: number, y: number, color: string): void {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, 1, 1);
+}
+
+function drawPixelOval(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  color: string,
+): void {
+  ctx.fillStyle = color;
+  for (let y = -ry; y <= ry; y++) {
+    for (let x = -rx; x <= rx; x++) {
+      const v = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+      if (v <= 1) ctx.fillRect(cx + x, cy + y, 1, 1);
+    }
+  }
 }
 
 export function setAssetsReady(): void {

@@ -121,12 +121,18 @@ const furniture: PlacedFurniture[] = [
   place('WOODEN_CHAIR_FRONT', 24, 14),
   place('WOODEN_CHAIR_FRONT', 25, 14),
 
-  // Big communal table in the middle of the dining room with three chairs
-  // above it (party seating). TABLE_FRONT = 3 cols × 4 rows footprint.
-  place('WOODEN_CHAIR_BACK', 11, 14),
-  place('WOODEN_CHAIR_BACK', 12, 14),
-  place('WOODEN_CHAIR_BACK', 13, 14),
+  // Big communal table in the middle of the dining room. Diners sit on
+  // three sides — north, west, east — and the south side (closest to the
+  // viewer) is left open. There's a fresh pizza on the table.
+  // TABLE_FRONT = 3 cols × 4 rows footprint, top row decorative.
+  // SOFA_FRONT spans 2 tiles north of the table; SOFA_SIDE flanks east and
+  // west. The side sofas are mirrored so their back-rest faces AWAY from
+  // the table (so a seated diner faces inward toward the food).
+  place('SOFA_FRONT', 11, 14),
+  place('SOFA_SIDE', 10, 16),       // west sofa: back faces west (away)
+  place('SOFA_SIDE', 14, 16, true), // east sofa: back faces east (away — mirrored)
   place('TABLE_FRONT', 11, 15),
+  place('PIZZA', 11, 17),
 
   // Dispatch corner (bottom-left) — whiteboard with delivery info
   place('WHITEBOARD', 1, 16),
@@ -151,7 +157,13 @@ const interactables: Interactable[] = [
   { id: 'ingredients', col: 3, row: 8, label: 'Ингредиенты' },
   { id: 'sauces', col: 8, row: 8, label: 'Соусы' },
   { id: 'register', col: 17, row: 10, label: 'Касса' },
+  // Courier-style station near the whiteboard — covers delivery time +
+  // 60-minute promise.
   { id: 'dispatch', col: 2, row: 18, label: 'Доставка' },
+  // Regions chart sits on the big communal table — placed above the
+  // table on the right (north-east corner) so the player can approach
+  // from the open dining floor north or east of the table.
+  { id: 'regions', col: 14, row: 14, label: 'Карта России' },
 ];
 
 // ── Characters ─────────────────────────────────────────────────────
@@ -159,7 +171,7 @@ const interactables: Interactable[] = [
 // Palette index → character sprite sheet:
 //   0 boy with tie     1 blonde with apron     2 person with afro (orange)
 //   3 older with white hair (suit)     4 boy without tie     5 person with red dress
-// Each character gets a unique palette so no two look the same.
+// Six unique palettes for six characters.
 const characters = [
   // Sasha (player) — palette 4 (the guy without a tie)
   createCharacter({
@@ -171,10 +183,10 @@ const characters = [
     name: 'Саша',
     dir: Direction.UP,
   }),
-  // Vika (manager) — palette 2, in back office
+  // Vika (manager) — palette 1 (blonde girl), in back office
   createCharacter({
     id: 'vika',
-    paletteIndex: 2,
+    paletteIndex: 1,
     col: 17,
     row: 3,
     name: 'Вика',
@@ -182,7 +194,7 @@ const characters = [
     wanders: true,
     wanderRadius: 3,
   }),
-  // Pizzaiolo 1 (Andrey) — palette 3, near oven
+  // Pizzaiolo (Andrey) — palette 3, near oven
   createCharacter({
     id: 'pizzaiolo_1',
     paletteIndex: 3,
@@ -193,38 +205,63 @@ const characters = [
     wanders: true,
     wanderRadius: 4,
   }),
-  // Pizzaiolo 2 (Liza) — palette 1 (blonde with apron, fits the role)
+
+  // ── Three diners seated on sofas around the big communal table ────
+  // The big table is at cols 11–13, rows 15–18 (south side closest to
+  // viewer is empty). Each diner is from a different federal district
+  // and is placed sitting on a sofa.
+
+  // North side — Far East (Дальневосточный ФО). Sits on the north sofa
+  // (col 12, row 14). The sofa is rendered with a +8 px y-offset so it
+  // hugs the table, and the seated drop pulls the diner forward so he
+  // looks like he's leaning over the food.
   createCharacter({
-    id: 'pizzaiolo_2',
-    paletteIndex: 1,
-    col: 9,
-    row: 5,
-    name: 'Лиза',
-    dir: Direction.UP,
-    wanders: true,
-    wanderRadius: 4,
+    id: 'diner_far_east',
+    paletteIndex: 0,
+    col: 12,
+    row: 14,
+    name: 'Гость из Владивостока',
+    dir: Direction.DOWN,
+    wanders: false,
+    seated: true,
   }),
-  // Courier (Dima) — palette 5
+  // West side — Volga (Приволжский ФО) — palette 2 (afro orange) so Vika
+  // and Volga don't share the blonde sprite.
+  createCharacter({
+    id: 'diner_volga',
+    paletteIndex: 2,
+    col: 10,
+    row: 16,
+    name: 'Гость из Казани',
+    dir: Direction.RIGHT,
+    wanders: false,
+    seated: true,
+  }),
+  // East side — Siberia (Сибирский ФО)
+  createCharacter({
+    id: 'diner_siberia',
+    paletteIndex: 5,
+    col: 14,
+    row: 16,
+    name: 'Гость из Новосибирска',
+    dir: Direction.LEFT,
+    wanders: false,
+    seated: true,
+  }),
+
+  // Courier — palette 1 (blonde with apron-like uniform), with a big
+  // delivery backpack. Stationed in the dispatch corner near the
+  // whiteboard. Volga diner shares the palette but they're far apart.
   createCharacter({
     id: 'courier',
-    paletteIndex: 5,
+    paletteIndex: 1,
     col: 4,
     row: 17,
     name: 'Дима-курьер',
-    dir: Direction.UP,
+    dir: Direction.DOWN,
     wanders: true,
-    wanderRadius: 5,
-  }),
-  // Visitor — palette 0 (the only one left). One visitor only — no duplicates.
-  createCharacter({
-    id: 'visitor_1',
-    paletteIndex: 0,
-    col: 23,
-    row: 5,
-    name: 'Гость',
-    dir: Direction.LEFT,
-    wanders: true,
-    wanderRadius: 4,
+    wanderRadius: 3,
+    hasBackpack: true,
   }),
 ];
 

@@ -1,6 +1,10 @@
 :root {
-  --dodo-red: #e2231a;
-  --dodo-red-dark: #a01510;
+  /* Main Dodo corporate color */
+  --dodo-orange: #ff6900;
+  --dodo-orange-dark: #993f00;
+  /* Aliases kept so existing rules don't all need renaming */
+  --dodo-red: #ff6900;
+  --dodo-red-dark: #993f00;
   --dodo-cream: #fff7e6;
   --dodo-charcoal: #1a1a1a;
   --dodo-yellow: #ffd23f;
@@ -29,7 +33,7 @@ button:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, #2a1410, #0d0706 80%);
+  background: radial-gradient(circle at center, #2a1a0a, #0d0805 80%);
   gap: 16px;
 }
 
@@ -58,32 +62,46 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 30% 30%, rgba(226, 35, 26, 0.25), transparent 60%),
+    radial-gradient(circle at 30% 30%, rgba(255, 105, 0, 0.28), transparent 60%),
     radial-gradient(circle at 70% 80%, rgba(255, 210, 63, 0.15), transparent 60%),
-    #1a1010;
-  padding: 24px;
+    #1a1208;
+  padding: 16px 24px;
+  overflow: auto;
 }
+
 
 .introTitle {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   user-select: none;
 }
 
+.introCanvas {
+  display: block;
+  margin: 0 auto 16px;
+  image-rendering: pixelated;
+  border: 4px solid var(--dodo-charcoal);
+  box-shadow:
+    0 0 0 4px var(--dodo-cream),
+    0 0 0 8px var(--dodo-charcoal),
+    8px 8px 0 8px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+}
+
 .introBrand {
-  font-size: 110px;
-  letter-spacing: 8px;
+  font-size: 64px;
+  letter-spacing: 6px;
   color: var(--dodo-red);
   text-shadow:
-    4px 4px 0 var(--dodo-red-dark),
-    8px 8px 0 var(--dodo-charcoal);
+    3px 3px 0 var(--dodo-red-dark),
+    6px 6px 0 var(--dodo-charcoal);
 }
 
 .introSub {
   margin-top: 8px;
-  font-size: 28px;
+  font-size: 18px;
   color: var(--dodo-yellow);
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   text-transform: uppercase;
 }
 
@@ -121,6 +139,16 @@ button:focus-visible {
   min-height: 100px;
 }
 
+/* Compact dialogue box: used when the line is already shown as a speech
+ * bubble above the speaker. Drop the body-text reservation height. */
+.dialogueBoxCompact {
+  padding: 14px 22px;
+}
+
+.dialogueBoxCompact .dialogueActions {
+  margin-top: 6px;
+}
+
 .dialogueActions {
   margin-top: 14px;
   display: flex;
@@ -153,12 +181,12 @@ button:focus-visible {
 }
 
 .btnPrimary {
-  background: var(--dodo-red);
+  background: var(--dodo-orange);
   color: var(--dodo-cream);
 }
 
 .btnPrimary:hover {
-  background: #ff3a30;
+  background: #ff8a3a;
 }
 
 .btnGhost {
@@ -339,9 +367,9 @@ button:focus-visible {
 }
 
 .modalIntro {
-  padding: 14px 22px;
+  padding: 16px 24px;
   border-bottom: 2px dashed var(--dodo-charcoal);
-  font-size: 21px;
+  font-size: 24px;
   line-height: 1.5;
   background: #fffaee;
 }
@@ -413,7 +441,7 @@ button:focus-visible {
 }
 
 .quizQuestion {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -427,11 +455,11 @@ button:focus-visible {
 .quizOption {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 14px;
+  padding: 14px 18px;
   background: var(--dodo-cream);
   border: 3px solid var(--dodo-charcoal);
-  font-size: 20px;
+  font-size: 24px;
   text-align: left;
   cursor: pointer;
   font-family: inherit;
@@ -457,12 +485,13 @@ button:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   background: var(--dodo-charcoal);
   color: var(--dodo-cream);
   flex-shrink: 0;
   font-weight: 700;
+  font-size: 22px;
 }
 
 .quizOptionCorrect {
@@ -505,12 +534,12 @@ button:focus-visible {
 
 .quizFeedbackTitle {
   font-weight: 700;
-  font-size: 21px;
+  font-size: 26px;
 }
 
 .quizFeedbackText {
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: 22px;
+  line-height: 1.5;
 }
 
 /* ── Ending screen ─────────────────────────────────────── */
@@ -522,8 +551,8 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at center, rgba(226, 35, 26, 0.18), transparent 60%),
-    #1a1010;
+    radial-gradient(circle at center, rgba(255, 105, 0, 0.2), transparent 60%),
+    #1a1208;
   padding: 24px;
 }
 

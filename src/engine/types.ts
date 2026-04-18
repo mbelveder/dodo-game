@@ -44,6 +44,19 @@ export interface FurnitureDef {
   footprintH: number;
   /** Top N rows of the footprint don't block walking (decorative top of tall sprite) */
   backgroundTiles?: number;
+  /** True for items that sit on top of a desk/table — they are z-sorted to draw
+   *  in front of furniture on the same tiles, so a pizza on a table still shows. */
+  surface?: boolean;
+  /** True for "front/side" sofas + chairs: their zY is capped to the first
+   *  row's bottom so a seated character renders in front of them.
+   *  Mirrors the chair-z-sort logic from pixel-agents. */
+  seatLow?: boolean;
+  /** Optional post-load color tint applied to the sprite. */
+  tint?: 'orange';
+  /** Optional render-time vertical offset (in sprite pixels). Positive
+   *  values push the sprite down. Useful for nudging a sofa to visually
+   *  hug the table below it. */
+  yOffsetPx?: number;
 }
 
 export interface PlacedFurniture {
@@ -105,4 +118,9 @@ export interface Character {
   isPlayer: boolean;
   /** Optional display name (for debug / future features) */
   name?: string;
+  /** When true, the character is drawn slightly lower so they appear to be
+   *  seated in their tile's sofa/chair. */
+  seated: boolean;
+  /** When true, a small pixel-art backpack is drawn behind the character. */
+  hasBackpack: boolean;
 }

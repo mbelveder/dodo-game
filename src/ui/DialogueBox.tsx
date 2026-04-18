@@ -8,6 +8,10 @@ interface DialogueBoxProps {
   showSkip?: boolean;
   /** Whether the next button shows "Дальше" or final-step label */
   nextLabel?: string;
+  /** When true, the body text is hidden — used in the intro when the line is
+   *  already shown as a speech bubble above the speaker, to avoid showing the
+   *  same text twice. The speaker tag and Next button still render. */
+  textInBubble?: boolean;
 }
 
 const SPEAKER_COLORS: Record<DialogueBoxProps['speaker'], string> = {
@@ -23,14 +27,15 @@ export function DialogueBox({
   onSkip,
   showSkip,
   nextLabel = 'Дальше ▸',
+  textInBubble = false,
 }: DialogueBoxProps) {
   return (
     <div className="dialogueWrap">
-      <div className="dialogueBox">
+      <div className={`dialogueBox${textInBubble ? ' dialogueBoxCompact' : ''}`}>
         <div className="dialogueSpeaker" style={{ color: SPEAKER_COLORS[speaker] }}>
-          {speaker === 'narrator' ? '— Рассказчик —' : speaker}
+          {speaker === 'narrator' ? '— Рассказчик —' : `${speaker} говорит…`}
         </div>
-        <div className="dialogueText">{text}</div>
+        {!textInBubble && <div className="dialogueText">{text}</div>}
         <div className="dialogueActions">
           {showSkip && onSkip && (
             <button className="btn btnGhost" onClick={onSkip}>

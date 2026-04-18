@@ -67,14 +67,18 @@ export function createGameState(opts: {
   };
 }
 
+/** Player must be within this Manhattan distance to trigger an interactable.
+ *  Set to 2 so big-footprint furniture (like the communal table) can still
+ *  be reached when the tiles immediately around the interactable are blocked. */
+const INTERACT_RADIUS = 2;
+
 export function findActiveInteractable(state: GameState): Interactable | null {
-  // Player must be on the interactable tile or directly adjacent (4-conn)
   const px = state.player.tileCol;
   const py = state.player.tileRow;
   let best: { i: Interactable; dist: number } | null = null;
   for (const it of state.interactables) {
     const dist = Math.abs(it.col - px) + Math.abs(it.row - py);
-    if (dist <= 1) {
+    if (dist <= INTERACT_RADIUS) {
       if (!best || dist < best.dist) best = { i: it, dist };
     }
   }

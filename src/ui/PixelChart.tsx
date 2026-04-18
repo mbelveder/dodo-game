@@ -13,19 +13,19 @@ export interface PixelChartProps {
   type: ChartKind;
   data: ChartDatum[];
   unit?: string;
-  /** Width in CSS pixels (default 360) */
+  /** Width in CSS pixels (default 420) */
   width?: number;
-  /** Height in CSS pixels (default 240) */
+  /** Height in CSS pixels (default 260) */
   height?: number;
 }
 
 const SERIES_COLORS = [
-  DODO_PALETTE.red,
+  DODO_PALETTE.orange,
   DODO_PALETTE.yellow,
   '#3FA34D',
   '#2A9DF4',
   '#A65EE0',
-  '#FF8B3D',
+  '#993F00',
   '#5C4232',
 ];
 
@@ -33,8 +33,8 @@ export function PixelChart({
   type,
   data,
   unit,
-  width = 360,
-  height = 240,
+  width = 420,
+  height = 260,
 }: PixelChartProps) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -138,8 +138,12 @@ function drawHBar(
   h: number,
   unit?: string,
 ) {
-  const padL = 110;
-  const padR = 36;
+  // Auto-fit label column to longest label so long Russian region names
+  // (e.g. "Северо-Западный ФО") aren't clipped.
+  ctx.font = FONT;
+  const maxLabelW = Math.max(...data.map((d) => ctx.measureText(d.label).width));
+  const padL = Math.min(w * 0.55, Math.max(110, maxLabelW + 12));
+  const padR = 56;
   const padT = 8;
   const padB = 16;
   const innerW = w - padL - padR;

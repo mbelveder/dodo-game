@@ -84,26 +84,42 @@ export function findPath(
   return [];
 }
 
-/** Find the closest walkable tile adjacent to a target (for click on furniture) */
+/** BFS outward from (targetCol, targetRow) until a walkable tile is found.
+ *  Returns null if nothing is found within `maxRadius`. Used to redirect a
+ *  click on a blocked tile (e.g. the middle of a big table) to the nearest
+ *  reachable spot. */
 export function findNearestWalkable(
   targetCol: number,
   targetRow: number,
   tileMap: TileType[][],
   blocked: Set<string>,
+  maxRadius = 4,
 ): Vec2 | null {
   if (isWalkable(targetCol, targetRow, tileMap, blocked)) {
     return { col: targetCol, row: targetRow };
   }
+  const visited = new Set<string>([`${targetCol},${targetRow}`]);
+  const queue: Array<{ col: number; row: number; dist: number }> = [
+    { col: targetCol, row: targetRow, dist: 0 },
+  ];
   const dirs = [
     { dc: 0, dr: -1 },
     { dc: 0, dr: 1 },
     { dc: -1, dr: 0 },
     { dc: 1, dr: 0 },
   ];
-  for (const d of dirs) {
-    const nc = targetCol + d.dc;
-    const nr = targetRow + d.dr;
-    if (isWalkable(nc, nr, tileMap, blocked)) return { col: nc, row: nr };
+  while (queue.length > 0) {
+    const cur = queue.shift()!;
+    if (cur.dist >= maxRadius) continue;
+    for (const d of dirs) {
+      const nc = cur.col + d.dc;
+      const nr = cur.row + d.dr;
+      const key = `${nc},${nr}`;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      if (isWalkable(nc, nr, tileMap, blocked)) return { col: nc, row: nr };
+      queue.push({ col: nc, row: nr, dist: cur.dist + 1 });
+    }
   }
   return null;
 }

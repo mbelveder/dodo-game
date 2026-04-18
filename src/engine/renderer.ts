@@ -11,6 +11,7 @@ import {
 } from './sprites';
 import {
   CharacterState,
+  Direction,
   TILE_SIZE,
   TileType,
   type Character,
@@ -19,7 +20,7 @@ import {
 import type { GameState } from './gameState';
 
 const TILE_COLORS: Record<TileType, string> = {
-  [TileType.WALL]: '#7A1410',
+  [TileType.WALL]: DODO_PALETTE.wall,
   [TileType.FLOOR]: '#F4E2C2',
   [TileType.KITCHEN]: '#D9D2C5',
   [TileType.DINING]: '#FFF7E6',
@@ -136,10 +137,25 @@ export function renderFrame(
     const img = getFurnitureImage(def.src);
     if (!img) continue;
     const x = offsetX + item.col * s;
-    const y = offsetY + item.row * s + (def.footprintH * TILE_SIZE - def.h) * ZOOM;
+    const yOffset = (def.yOffsetPx ?? 0) * ZOOM;
+    const y =
+      offsetY + item.row * s + (def.footprintH * TILE_SIZE - def.h) * ZOOM + yOffset;
     const drawW = def.w * ZOOM;
     const drawH = def.h * ZOOM;
-    const zY = (item.row + def.footprintH) * TILE_SIZE;
+    // Z-sort:
+    //   - Surface items (pizza on table) jump way up so they always draw in
+    //     front of the taller furniture they sit on.
+    //   - Chair/sofa with seatLow uses the chair-z-sort from pixel-agents:
+    //     cap zY to first-row bottom so a seated character renders in front.
+    //   - Default: bottom-edge of the footprint.
+    let zY: number;
+    if (def.surface) {
+      zY = (item.row + def.footprintH) * TILE_SIZE + 10000;
+    } else if (def.seatLow) {
+      zY = (item.row + 1) * TILE_SIZE;
+    } else {
+      zY = (item.row + def.footprintH) * TILE_SIZE;
+    }
     drawables.push({
       zY,
       draw: () => {
@@ -166,15 +182,25 @@ export function renderFrame(
     const f = getCharFrameRect(sheet, ch.dir, frameIdx);
     const drawW = CHAR_W * ZOOM;
     const drawH = CHAR_H * ZOOM;
-    // Anchor: feet at character's tile center bottom
+    // Anchor: feet at character's tile center bottom; seated diners drop
+    // by ~10 px so they look like they're leaning into the table, and
+    // their zY is boosted so they always draw in front of nearby
+    // furniture (sofa, table top decoration, etc.) — same trick
+    // pixel-agents uses.
+    const seatedDrop = ch.seated ? 10 : 0;
+    const seatedZBoost = ch.seated ? 1000 : 0;
     const feetX = offsetX + (ch.x - CHAR_W / 2) * ZOOM;
-    const feetY = offsetY + (ch.y - CHAR_H + TILE_SIZE / 2) * ZOOM;
-    const zY = ch.y + TILE_SIZE / 2 + 0.5;
+    const feetY = offsetY + (ch.y - CHAR_H + TILE_SIZE / 2 + seatedDrop) * ZOOM;
+    const zY = ch.y + TILE_SIZE / 2 + 0.5 + seatedDrop + seatedZBoost;
     const isPlayer = ch.isPlayer;
+    const hasBackpack = ch.hasBackpack;
+    const dirForBackpack = ch.dir;
     drawables.push({
       zY,
       draw: () => {
+        if (hasBackpack) drawBackpack(ctx, feetX, feetY, drawW, drawH, dirForBackpack, true);
         ctx.drawImage(f.source, f.sx, f.sy, f.sw, f.sh, feetX, feetY, drawW, drawH);
+        if (hasBackpack) drawBackpack(ctx, feetX, feetY, drawW, drawH, dirForBackpack, false);
         if (isPlayer) drawPlayerMarker(ctx, feetX + drawW / 2, feetY - 4 * ZOOM);
       },
     });
@@ -189,6 +215,62 @@ export function renderFrame(
     const px = offsetX + ch.x * ZOOM;
     const py = offsetY + (ch.y - CHAR_H + TILE_SIZE / 2 - 4) * ZOOM;
     drawSpeechBubble(ctx, ch.bubble.text, px, py, ch.bubble.remaining);
+  }
+}
+
+/**
+ * Draw a chunky pixel-art delivery backpack on a character. Called twice per
+ * character render — first as a "behind" pass (drawn before the character so
+ * it appears behind their head/body when facing the camera) and again as a
+ * "front" pass (drawn over the character when they face away).
+ */
+function drawBackpack(
+  ctx: CanvasRenderingContext2D,
+  feetX: number,
+  feetY: number,
+  drawW: number,
+  _drawH: number,
+  dir: Direction,
+  isBehindPass: boolean,
+): void {
+  // Backpack shape (in sprite-pixel units, ZOOM applied):
+  //   16 wide, 18 tall block sitting roughly between the character's
+  //   shoulders. Painted in Dodo orange with a charcoal outline and a
+  //   small yellow logo strip.
+  const facingAway = dir === Direction.UP;
+  const facingDown = dir === Direction.DOWN;
+  if (facingAway && isBehindPass) return; // back is visible — draw on the front pass
+  if (!facingAway && !isBehindPass) return; // front-facing character — draw behind
+  const px = ZOOM;
+  const cx = feetX + drawW / 2;
+  // Vertical position: backpack sits on the upper third of the sprite
+  const top = feetY + 6 * px;
+  // Horizontal offset for side-facing characters so the pack hangs off one
+  // shoulder rather than centered.
+  let dx = 0;
+  if (dir === Direction.LEFT) dx = 2 * px;
+  else if (dir === Direction.RIGHT) dx = -2 * px;
+  const w = 11 * px;
+  const h = 14 * px;
+  const left = Math.round(cx - w / 2 + dx);
+  const t = Math.round(top);
+  // Outline
+  ctx.fillStyle = DODO_PALETTE.charcoal;
+  ctx.fillRect(left - px, t - px, w + 2 * px, h + 2 * px);
+  // Body
+  ctx.fillStyle = DODO_PALETTE.orange;
+  ctx.fillRect(left, t, w, h);
+  // Top flap
+  ctx.fillStyle = DODO_PALETTE.redDark;
+  ctx.fillRect(left, t, w, 3 * px);
+  // Yellow strap / logo strip
+  ctx.fillStyle = DODO_PALETTE.yellow;
+  ctx.fillRect(left + 2 * px, t + 5 * px, w - 4 * px, 2 * px);
+  // Two carry-strap shoulders for the front-facing variants only
+  if (facingDown) {
+    ctx.fillStyle = DODO_PALETTE.charcoal;
+    ctx.fillRect(left - 2 * px, t + px, 2 * px, 5 * px);
+    ctx.fillRect(left + w, t + px, 2 * px, 5 * px);
   }
 }
 
@@ -229,7 +311,7 @@ function drawPlayerMarker(ctx: CanvasRenderingContext2D, cx: number, cy: number)
   const t = (performance.now() / 400) % (Math.PI * 2);
   const bob = Math.sin(t) * 2;
   const pad = 2;
-  // Pixel chevron (down-pointing arrow) in Dodo yellow with charcoal outline
+  // Pixel chevron (down-pointing arrow) in Dodo orange with charcoal outline
   ctx.save();
   ctx.translate(Math.round(cx), Math.round(cy + bob));
   // Outline
@@ -241,8 +323,8 @@ function drawPlayerMarker(ctx: CanvasRenderingContext2D, cx: number, cy: number)
   ctx.lineTo(0, 6 + pad);
   ctx.closePath();
   ctx.fill();
-  // Fill
-  ctx.fillStyle = DODO_PALETTE.yellow;
+  // Fill — corporate orange
+  ctx.fillStyle = DODO_PALETTE.orange;
   ctx.fillRect(-7, -10, 14, 6);
   ctx.beginPath();
   ctx.moveTo(-7, -4);

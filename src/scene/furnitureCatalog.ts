@@ -136,6 +136,56 @@ const CATALOG: Record<string, FurnitureDef> = {
     footprintW: 1,
     footprintH: 1,
   },
+  PIZZA: {
+    id: 'PIZZA',
+    src: 'synthetic://pizza',
+    w: 32,
+    h: 16,
+    footprintW: 2,
+    footprintH: 1,
+    surface: true,
+  },
+  // Sofas around the big communal table. SOFA_FRONT shows the back-rest at
+  // the top (used when characters sit south of the back-rest, facing south).
+  // SOFA_SIDE is a side-profile (used for east/west seating, mirrored for the
+  // opposite side via the `mirror` flag in PlacedFurniture).
+  // All sofa variants are tinted to Dodo orange and use the chair z-sort
+  // ("seatLow") so seated characters render in front of them, like in
+  // pixel-agents.
+  SOFA_FRONT: {
+    id: 'SOFA_FRONT',
+    src: '/furniture/SOFA/SOFA_FRONT.png',
+    w: 32,
+    h: 16,
+    footprintW: 2,
+    footprintH: 1,
+    seatLow: true,
+    tint: 'orange',
+    // Push the north sofa down 8 px so it visually overlaps the table's
+    // decorative top edge — eliminates the "floating away" gap.
+    yOffsetPx: 8,
+  },
+  SOFA_BACK: {
+    id: 'SOFA_BACK',
+    src: '/furniture/SOFA/SOFA_BACK.png',
+    w: 32,
+    h: 16,
+    footprintW: 2,
+    footprintH: 1,
+    seatLow: true,
+    tint: 'orange',
+  },
+  SOFA_SIDE: {
+    id: 'SOFA_SIDE',
+    src: '/furniture/SOFA/SOFA_SIDE.png',
+    w: 16,
+    h: 32,
+    footprintW: 1,
+    footprintH: 2,
+    backgroundTiles: 1,
+    seatLow: true,
+    tint: 'orange',
+  },
 };
 
 export function getFurnitureDef(id: string): FurnitureDef | undefined {
@@ -144,4 +194,8 @@ export function getFurnitureDef(id: string): FurnitureDef | undefined {
 
 export function getAllFurnitureSrcs(): string[] {
   return Object.values(CATALOG).map((d) => d.src);
+}
+
+export function getAllFurnitureRequests(): Array<{ src: string; tint?: 'orange' }> {
+  return Object.values(CATALOG).map((d) => ({ src: d.src, tint: d.tint }));
 }
