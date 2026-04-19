@@ -38,132 +38,14 @@ export function getStationSteps(station: Station): StationStep[] {
 
 /**
  * IMPORTANT: station ids must match the `id` of interactables placed in
- * `scene/pizzeriaLayout.ts`. Currently: oven, dough, ingredients, sauces,
- * register, dispatch, dodster, capitals, tile_map, regions, holidays.
+ * `scene/pizzeriaLayout.ts`. Currently: register, dispatch, dodster,
+ * capitals, tile_map, regions, holidays.
  *
  * Teammates: drop your infographics into `public/infographics/` and reference
  * by `/infographics/<file>.png`, OR replace `kind: 'image'` with
  * `kind: 'pixelChart'` and supply chart data.
  */
 export const STATIONS: Station[] = [
-  {
-    id: 'oven',
-    label: 'Печь',
-    intro:
-      'Печь работает 16 часов в сутки. Здесь рождаются все пиццы Додо. Узнай, какая пицца нагревает её чаще всего.',
-    infographic: {
-      kind: 'pixelChart',
-      caption: 'Топ-5 пицц по числу заказов за месяц',
-      chart: {
-        type: 'hbar',
-        data: [
-          { label: 'Пепперони', value: 1240 },
-          { label: 'Маргарита', value: 980 },
-          { label: 'Гавайская', value: 760 },
-          { label: 'Четыре сыра', value: 540 },
-          { label: 'Мясная', value: 410 },
-        ],
-        unit: 'шт',
-      },
-    },
-    quiz: {
-      question: 'Какая пицца самая популярная в Додо?',
-      options: ['Маргарита', 'Пепперони', 'Гавайская', 'Четыре сыра'],
-      correctIndex: 1,
-      explain:
-        'Пепперони — абсолютный лидер. Она опережает Маргариту почти на треть заказов.',
-    },
-  },
-  {
-    id: 'dough',
-    label: 'Тесто',
-    intro:
-      'Тесто Додо отдыхает 24 часа перед раскаткой. Сколько килограммов уходит на одну смену?',
-    infographic: {
-      kind: 'pixelChart',
-      caption: 'Расход теста за неделю, кг',
-      chart: {
-        type: 'bar',
-        data: [
-          { label: 'Пн', value: 38 },
-          { label: 'Вт', value: 41 },
-          { label: 'Ср', value: 44 },
-          { label: 'Чт', value: 47 },
-          { label: 'Пт', value: 72 },
-          { label: 'Сб', value: 88 },
-          { label: 'Вс', value: 81 },
-        ],
-        unit: 'кг',
-      },
-    },
-    quiz: {
-      question: 'В какой день недели расход теста максимальный?',
-      options: ['Пятница', 'Суббота', 'Воскресенье', 'Среда'],
-      correctIndex: 1,
-      explain:
-        'Суббота — пик. К субботе люди заказывают больше всего, и тесто приходится готовить заранее.',
-    },
-  },
-  {
-    id: 'ingredients',
-    label: 'Ингредиенты',
-    intro:
-      'У Додо строгий список ингредиентов. Один из них чаще всего путают новички. Изучи раскладку.',
-    infographic: {
-      kind: 'pixelChart',
-      caption: 'Доля ошибок по ингредиенту, %',
-      chart: {
-        type: 'pie',
-        data: [
-          { label: 'Базилик ↔ Шпинат', value: 34 },
-          { label: 'Моцарелла ↔ Сулугуни', value: 22 },
-          { label: 'Пепперони ↔ Салями', value: 18 },
-          { label: 'Прочее', value: 26 },
-        ],
-        unit: '%',
-      },
-    },
-    quiz: {
-      question: 'Какие два ингредиента путают чаще всего?',
-      options: [
-        'Моцарелла и сулугуни',
-        'Пепперони и салями',
-        'Базилик и шпинат',
-        'Оливки и каперсы',
-      ],
-      correctIndex: 2,
-      explain:
-        'Базилик и шпинат — главные жертвы спешки. Запомни: у базилика лист гладкий и пахнет иначе.',
-    },
-  },
-  {
-    id: 'sauces',
-    label: 'Соусы',
-    intro:
-      'Соусы — душа пиццы. Какой из дополнительных соусов берут чаще всего к доставке?',
-    infographic: {
-      kind: 'pixelChart',
-      caption: 'Дополнительные соусы к заказу, %',
-      chart: {
-        type: 'hbar',
-        data: [
-          { label: 'Чесночный', value: 41 },
-          { label: 'Сырный', value: 28 },
-          { label: 'Барбекю', value: 17 },
-          { label: 'Ранч', value: 9 },
-          { label: 'Острый', value: 5 },
-        ],
-        unit: '%',
-      },
-    },
-    quiz: {
-      question: 'Самый популярный дополнительный соус Додо — это…',
-      options: ['Сырный', 'Барбекю', 'Чесночный', 'Ранч'],
-      correctIndex: 2,
-      explain:
-        'Чесночный соус — фаворит. Его берут к каждой третьей пицце на доставке.',
-    },
-  },
   {
     id: 'register',
     label: 'Касса',
@@ -193,36 +75,21 @@ export const STATIONS: Station[] = [
     id: 'dispatch',
     label: 'Доставка',
     intro:
-      'Сколько времени занимает доставка? И сколько успевает курьер за смену? Изучи доску.',
+      'Десерты и напитки по-разному «весят» в чеке: в доставке и в зале картина не совпадает. Посмотри на инфографику.',
     infographic: {
-      kind: 'pixelChart',
-      caption: 'Среднее время доставки по дням, мин',
-      chart: {
-        type: 'line',
-        data: [
-          { label: 'Пн', value: 23 },
-          { label: 'Вт', value: 24 },
-          { label: 'Ср', value: 25 },
-          { label: 'Чт', value: 27 },
-          { label: 'Пт', value: 32 },
-          { label: 'Сб', value: 35 },
-          { label: 'Вс', value: 31 },
-        ],
-        unit: 'мин',
-      },
+      kind: 'image',
+      src: '/img/delivery.png',
+      caption:
+        'Сравнение доли десертов и напитков в доставке и в ресторанах',
+      alt: 'Сравнение доли десертов и напитков в доставке и в ресторанах',
     },
     quiz: {
       question:
-        'Если доставка превысила 60 минут, что Додо обещает клиенту?',
-      options: [
-        'Скидку 10%',
-        'Бесплатный соус',
-        'Заказ бесплатно',
-        'Купон на 200 ₽',
-      ],
-      correctIndex: 2,
+        'Если объединить категории «десерты» + «напитки», где их суммарная доля выше?',
+      options: ['В доставке', 'В ресторанах', 'Примерно одинаково'],
+      correctIndex: 1,
       explain:
-        'Знаменитое обещание Додо: дольше 60 минут — заказ за наш счёт. Поэтому в субботу курьеры особенно собранны.',
+        'В зале гости чаще добавляют напитки и десерты к основному заказу; в доставке упор сильнее на «основу», поэтому суммарная доля этих категорий в ресторанах выше.',
     },
   },
   {

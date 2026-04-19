@@ -8,46 +8,43 @@ import {
 } from '../engine/types';
 
 /**
- * Pizzeria layout. 22 cols × 20 rows, single open room with floor-color zones.
+ * Pizzeria layout. 17 cols × 20 rows, single open room with floor-color zones.
  *
  * Tile codes:
  *   '#' wall, '.' kitchen floor, ',' dining floor, ':' counter (dark), '~' carpet (red welcome mat), ' ' void
  *
  * Zones:
- *   Top-left: kitchen (oven, dough table, prep — all map to interactables)
+ *   Top-left: open dining / decor (kitchen prep stations removed)
  *   Middle band (row 9): counter + cash register
  *   Right: dining hall with tables (narrower east wall)
  *   Bottom-left: dispatch corner with whiteboard
  */
 
-// Cash booth: walls surround cols 15-20 rows 1-8, with a single entry tile
-// at col 19 row 9 (the rest of the booth's south side is walled off, while
-// the bits of the counter band outside the booth — col 13 west of it — stay
-// as a regular counter strip for visual continuity).
-// 22×20 map (was 30 wide): eight columns removed from the east. Booth and
-// counter strip are preserved; east dining is narrowed to a single tile
-// where needed so vertical booth walls stay aligned.
+// Cash booth: walls surround cols 8–13 rows 1–8; south edge meets the
+// counter band on row 9. The narrow east strip (col 15) stays open for
+// walking past the inner wall (col 14).
+// 17×20 map: five interior columns removed from the west (left).
 const ROWS = [
-  '######################', // 0
-  '#,,,,,,,,,,,#,,,,,,#,#', // 1  11 west + boothW + 6 + boothE + 1 east + #
-  '#,,,,,,,,,,,#,,,,,,#,#', // 2
-  '#,,,,,,,,,,,#,,,,,,#,#', // 3
-  '#,,,,,,,,,,,#,,,,,,#,#', // 4
-  '#,,,,,,,,,,,#,,,,,,#,#', // 5
-  '#,,,,,,,,,,,#,,,,,,#,#', // 6
-  '#,,,,,,,,,,,#,,,,,,#,#', // 7
-  '#,,,,,,,,,,,#,,,,,,#,#', // 8
-  '#,,,,,,,,,,,:#####:###', // 9  counter strip; east wall immediately after
-  '#,,,,,,,,,,,,,,,,,,,,#', // 10
-  '#,,,,,,,,,,,,,,,,,,,,#', // 11
-  '#,,,,,,,,,,,,,,,,,,,,#', // 12
-  '#,,,,,,,,,,,,,,,,,,,,#', // 13
-  '#,,,,,,,,,,,,,,,,,,,,#', // 14
-  '#,,,,,,,,,,,,,,,,,,,,#', // 15
-  '#,,,,,,,,,,,,,,,,,,,,#', // 16
-  '#,,,,,,,,,,,,,,,,,,,,#', // 17
-  '#,,,,,,,,,,,,,,,,,,,,#', // 18
-  '######################', // 19
+  '#################', // 0
+  '#,,,,,,#,,,,,,#,#', // 1
+  '#,,,,,,#,,,,,,#,#', // 2
+  '#,,,,,,#,,,,,,#,#', // 3
+  '#,,,,,,#,,,,,,#,#', // 4
+  '#,,,,,,#,,,,,,#,#', // 5
+  '#,,,,,,#,,,,,,#,#', // 6
+  '#,,,,,,#,,,,,,#,#', // 7
+  '#,,,,,,#,,,,,,#,#', // 8
+  '#,,,,,,:#####:###', // 9
+  '#,,,,,,,,,,,,,,,#', // 10
+  '#,,,,,,,,,,,,,,,#', // 11
+  '#,,,,,,,,,,,,,,,#', // 12
+  '#,,,,,,,,,,,,,,,#', // 13
+  '#,,,,,,,,,,,,,,,#', // 14
+  '#,,,,,,,,,,,,,,,#', // 15
+  '#,,,,,,,,,,,,,,,#', // 16
+  '#,,,,,,,,,,,,,,,#', // 17
+  '#,,,,,,,,,,,,,,,#', // 18
+  '#################', // 19
 ];
 
 function decode(rows: string[]): TileType[][] {
@@ -85,47 +82,19 @@ function place(defId: string, col: number, row: number, mirror = false): PlacedF
 }
 
 const furniture: PlacedFurniture[] = [
-  // ── Upper-left big tables (oven + dough stations) ────────────────
-  // Each big table now has SOFA_SIDE flanking east and west so the
-  // "every big table has sofas" rule holds. North impossible (room
-  // wall), south kept clear so the player can approach the
-  // station's interactable tile from the south.
-  place('TABLE_FRONT', 2, 1), // ПЕЧЬ
-  place('SOFA_SIDE', 1, 2),       // oven west sofa
-  place('SOFA_SIDE', 5, 2, true), // oven east sofa (mirrored — back away)
-
-  place('TABLE_FRONT', 7, 1), // ТЕСТО
-  place('SOFA_SIDE', 6, 2),        // dough west sofa
-  place('SOFA_SIDE', 10, 2, true), // dough east sofa
-
-  // Side stations (small prep tables) — chairs on north + south sides
-  // like the rest of the small tables. The interactable tiles at
-  // (3, 8) and (8, 8) are reachable through the south-chair top tile.
-  place('SMALL_TABLE_FRONT', 2, 6), // ИНГРИДИЕНТЫ
-  place('WOODEN_CHAIR_BACK', 2, 5),
-  place('WOODEN_CHAIR_BACK', 3, 5),
-  place('WOODEN_CHAIR_FRONT', 2, 8),
-  place('WOODEN_CHAIR_FRONT', 3, 8),
-
-  place('SMALL_TABLE_FRONT', 7, 6), // САЛАТЫ / sauces
-  place('WOODEN_CHAIR_BACK', 7, 5),
-  place('WOODEN_CHAIR_BACK', 8, 5),
-  place('WOODEN_CHAIR_FRONT', 7, 8),
-  place('WOODEN_CHAIR_FRONT', 8, 8),
-
   // Counter row (row 9): cash register PC at counter. Pixel-art cash
   // sits ABOVE the monitor (row 7) — the cashier's till.
-  place('PC_FRONT', 17, 8),
-  place('CASH', 17, 7),
+  place('PC_FRONT', 12, 8),
+  place('CASH', 12, 7),
 
   // Big table in the cash area (replaces the two small tables that used
   // to live here). The white-haired host (Andrey) sits at it on the
   // north sofa; east/west sofas complete the booth seating like the
   // communal table.
-  place('SOFA_FRONT', 16, 1),
-  place('SOFA_SIDE', 15, 3),        // cash west sofa
-  place('SOFA_SIDE', 19, 3, true),  // cash east sofa (mirrored)
-  place('TABLE_FRONT', 16, 2),
+  place('SOFA_FRONT', 11, 1),
+  place('SOFA_SIDE', 10, 3),        // cash west sofa
+  place('SOFA_SIDE', 12, 3, true),  // cash east sofa (mirrored)
+  place('TABLE_FRONT', 11, 2),
 
   // ── Big communal table (center, rows 11-14) ───────────────────────
   // SOFA_FRONT spans 2 tiles north of the table; SOFA_SIDE flanks east
@@ -147,25 +116,44 @@ const furniture: PlacedFurniture[] = [
   // chair's seat side); north chairs use WOODEN_CHAIR_BACK (we see the
   // chair's back, which reads as "person facing south at the table").
   //
-  // Lower dining (south of the big communal table): four small tables
-  // in a regular row, all with full seating.
-  place('SMALL_TABLE_FRONT', 4, 16),
+  // Lower dining (south of the big communal table): three small tables
+  // spaced across the hall (west / mid / east).
+  place('SMALL_TABLE_FRONT', 3, 16),
+  place('WOODEN_CHAIR_BACK', 3, 15),
   place('WOODEN_CHAIR_BACK', 4, 15),
-  place('WOODEN_CHAIR_BACK', 5, 15),
+  place('WOODEN_CHAIR_FRONT', 3, 17),
   place('WOODEN_CHAIR_FRONT', 4, 17),
-  place('WOODEN_CHAIR_FRONT', 5, 17),
 
-  place('SMALL_TABLE_FRONT', 9, 16),
-  place('WOODEN_CHAIR_BACK', 9, 15),
-  place('WOODEN_CHAIR_BACK', 10, 15),
-  place('WOODEN_CHAIR_FRONT', 9, 17),
-  place('WOODEN_CHAIR_FRONT', 10, 17),
+  place('SMALL_TABLE_FRONT', 7, 16),
+  place('WOODEN_CHAIR_BACK', 7, 15),
+  place('WOODEN_CHAIR_BACK', 8, 15),
+  place('WOODEN_CHAIR_FRONT', 7, 17),
+  place('WOODEN_CHAIR_FRONT', 8, 17),
 
-  place('SMALL_TABLE_FRONT', 19, 16),
-  place('WOODEN_CHAIR_BACK', 19, 15),
-  place('WOODEN_CHAIR_BACK', 20, 15),
-  place('WOODEN_CHAIR_FRONT', 19, 17),
-  place('WOODEN_CHAIR_FRONT', 20, 17),
+  place('SMALL_TABLE_FRONT', 14, 16),
+  place('WOODEN_CHAIR_BACK', 14, 15),
+  place('WOODEN_CHAIR_BACK', 15, 15),
+  place('WOODEN_CHAIR_FRONT', 14, 17),
+  place('WOODEN_CHAIR_FRONT', 15, 17),
+
+  // Upper-left open dining: two small tables + chairs and a few plants
+  // (kitchen prep removed — fills the visual gap without blocking the
+  // west corridor to the counter).
+  place('SMALL_TABLE_FRONT', 2, 3),
+  place('WOODEN_CHAIR_BACK', 2, 2),
+  place('WOODEN_CHAIR_BACK', 3, 2),
+  place('WOODEN_CHAIR_FRONT', 2, 4),
+  place('WOODEN_CHAIR_FRONT', 3, 4),
+
+  place('SMALL_TABLE_FRONT', 5, 7),
+  place('WOODEN_CHAIR_BACK', 5, 6),
+  place('WOODEN_CHAIR_BACK', 6, 6),
+  place('WOODEN_CHAIR_FRONT', 5, 8),
+  place('WOODEN_CHAIR_FRONT', 6, 8),
+
+  place('PLANT', 1, 2),
+  place('PLANT', 4, 1),
+  place('PLANT', 6, 4),
 
   // Dispatch corner (bottom-left) — whiteboard with delivery info
   place('WHITEBOARD', 1, 16),
@@ -174,24 +162,20 @@ const furniture: PlacedFurniture[] = [
   // behind the tie guy (north of him on the counter band) so it reads
   // as standing decoration behind the diner without crowding him.
   place('PLANT', 12, 9),  // behind tie guy on the counter band
-  place('PLANT', 20, 17), // bottom-right corner (tight room)
+  place('PLANT', 15, 17), // bottom-right corner (tight room)
   place('PLANT', 1, 11),  // left wall by big table
-  place('PLANT', 20, 4),  // upper-right by east wall
+  place('PLANT', 15, 4),  // upper-right by east wall
   place('PLANT', 14, 5),  // upper-mid open area
-  place('PLANT', 6, 17),  // bottom-left dispatch area
-  place('CACTUS', 18, 11), // by the open central walkway
-  place('BIN', 20, 18),
-  place('COFFEE', 11, 1),
+  place('PLANT', 6, 17),  // bottom-left dispatch area (clear of courier home)
+  place('CACTUS', 13, 11), // by the open central walkway
+  place('BIN', 15, 18),
+  place('COFFEE', 10, 2),
 ];
 
 // ── Interactables (stations) ──────────────────────────────────────
 
 const interactables: Interactable[] = [
-  { id: 'oven', col: 3, row: 4, label: 'Печь' },
-  { id: 'dough', col: 8, row: 4, label: 'Тесто' },
-  { id: 'ingredients', col: 3, row: 8, label: 'Ингредиенты' },
-  { id: 'sauces', col: 8, row: 8, label: 'Соусы' },
-  { id: 'register', col: 17, row: 7, label: 'Касса' },
+  { id: 'register', col: 12, row: 7, label: 'Касса' },
   // Courier-style station near the whiteboard — covers delivery time +
   // 60-minute promise.
   { id: 'dispatch', col: 2, row: 18, label: 'Доставка' },
@@ -204,8 +188,8 @@ const interactables: Interactable[] = [
   // big table. Player can approach from north, east, or the table's
   // top decorative row.
   { id: 'dodster', col: 13, row: 13, label: 'Додстеры' },
-  // Holiday ordering quiz — lower-right floor near the small table (19,16).
-  { id: 'holidays', col: 20, row: 15, label: 'Праздники' },
+  // Holiday ordering quiz — east dining strip below the counter band.
+  { id: 'holidays', col: 14, row: 10, label: 'Праздники' },
 ];
 
 // ── Characters ─────────────────────────────────────────────────────
@@ -221,7 +205,7 @@ const characters = [
   createCharacter({
     id: 'sasha',
     paletteIndex: 4,
-    col: 18,
+    col: 13,
     row: 16,
     isPlayer: true,
     name: 'Саша',
@@ -232,7 +216,7 @@ const characters = [
   createCharacter({
     id: 'vika',
     paletteIndex: 1,
-    col: 19,
+    col: 14,
     row: 4,
     name: 'Вика',
     dir: Direction.DOWN,
@@ -245,7 +229,7 @@ const characters = [
   createCharacter({
     id: 'pizzaiolo_1',
     paletteIndex: 3,
-    col: 17,
+    col: 12,
     row: 1,
     name: 'Андрей',
     dir: Direction.DOWN,
@@ -305,7 +289,7 @@ const characters = [
     name: 'Дима-курьер',
     dir: Direction.DOWN,
     wanders: true,
-    wanderRadius: 3,
+    wanderRadius: 2,
     hasBackpack: true,
   }),
 ];
