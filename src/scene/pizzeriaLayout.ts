@@ -8,7 +8,7 @@ import {
 } from '../engine/types';
 
 /**
- * Pizzeria layout. 30 cols × 20 rows, single open room with floor-color zones.
+ * Pizzeria layout. 22 cols × 20 rows, single open room with floor-color zones.
  *
  * Tile codes:
  *   '#' wall, '.' kitchen floor, ',' dining floor, ':' counter (dark), '~' carpet (red welcome mat), ' ' void
@@ -16,36 +16,38 @@ import {
  * Zones:
  *   Top-left: kitchen (oven, dough table, prep — all map to interactables)
  *   Middle band (row 9): counter + cash register
- *   Right: dining hall with tables
+ *   Right: dining hall with tables (narrower east wall)
  *   Bottom-left: dispatch corner with whiteboard
- *   Top-right small cubby: back office (Vika's desk)
  */
 
 // Cash booth: walls surround cols 15-20 rows 1-8, with a single entry tile
 // at col 19 row 9 (the rest of the booth's south side is walled off, while
 // the bits of the counter band outside the booth — col 13 west of it — stay
 // as a regular counter strip for visual continuity).
+// 22×20 map (was 30 wide): eight columns removed from the east. Booth and
+// counter strip are preserved; east dining is narrowed to a single tile
+// where needed so vertical booth walls stay aligned.
 const ROWS = [
-  '##############################', // 0
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 1  (single open dining hall + cash booth)
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 2
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 3
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 4
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 5
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 6
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 7
-  '#,,,,,,,,,,,,,#,,,,,,#,,,,,,,#', // 8
-  '#,,,,,,,,,,,,:#####:##,,,,,,,#', // 9  (booth south wall, entry at col 19)
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 10
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 11
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 12
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 13
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 14
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 15
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 16
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 17
-  '#,,,,,,,,,,,,,,,,,,,,,,,,,,,,#', // 18
-  '##############################', // 19
+  '######################', // 0
+  '#,,,,,,,,,,,#,,,,,,#,#', // 1  11 west + boothW + 6 + boothE + 1 east + #
+  '#,,,,,,,,,,,#,,,,,,#,#', // 2
+  '#,,,,,,,,,,,#,,,,,,#,#', // 3
+  '#,,,,,,,,,,,#,,,,,,#,#', // 4
+  '#,,,,,,,,,,,#,,,,,,#,#', // 5
+  '#,,,,,,,,,,,#,,,,,,#,#', // 6
+  '#,,,,,,,,,,,#,,,,,,#,#', // 7
+  '#,,,,,,,,,,,#,,,,,,#,#', // 8
+  '#,,,,,,,,,,,:#####:###', // 9  counter strip; east wall immediately after
+  '#,,,,,,,,,,,,,,,,,,,,#', // 10
+  '#,,,,,,,,,,,,,,,,,,,,#', // 11
+  '#,,,,,,,,,,,,,,,,,,,,#', // 12
+  '#,,,,,,,,,,,,,,,,,,,,#', // 13
+  '#,,,,,,,,,,,,,,,,,,,,#', // 14
+  '#,,,,,,,,,,,,,,,,,,,,#', // 15
+  '#,,,,,,,,,,,,,,,,,,,,#', // 16
+  '#,,,,,,,,,,,,,,,,,,,,#', // 17
+  '#,,,,,,,,,,,,,,,,,,,,#', // 18
+  '######################', // 19
 ];
 
 function decode(rows: string[]): TileType[][] {
@@ -145,19 +147,6 @@ const furniture: PlacedFurniture[] = [
   // chair's seat side); north chairs use WOODEN_CHAIR_BACK (we see the
   // chair's back, which reads as "person facing south at the table").
   //
-  // Upper area, east of the cash booth:
-  place('SMALL_TABLE_FRONT', 24, 2),
-  place('WOODEN_CHAIR_BACK', 24, 1),
-  place('WOODEN_CHAIR_BACK', 25, 1),
-  place('WOODEN_CHAIR_FRONT', 24, 3),
-  place('WOODEN_CHAIR_FRONT', 25, 3),
-
-  place('SMALL_TABLE_FRONT', 24, 6),
-  place('WOODEN_CHAIR_BACK', 24, 5),
-  place('WOODEN_CHAIR_BACK', 25, 5),
-  place('WOODEN_CHAIR_FRONT', 24, 7),
-  place('WOODEN_CHAIR_FRONT', 25, 7),
-
   // Lower dining (south of the big communal table): four small tables
   // in a regular row, all with full seating.
   place('SMALL_TABLE_FRONT', 4, 16),
@@ -178,12 +167,6 @@ const furniture: PlacedFurniture[] = [
   place('WOODEN_CHAIR_FRONT', 19, 17),
   place('WOODEN_CHAIR_FRONT', 20, 17),
 
-  place('SMALL_TABLE_FRONT', 24, 16),
-  place('WOODEN_CHAIR_BACK', 24, 15),
-  place('WOODEN_CHAIR_BACK', 25, 15),
-  place('WOODEN_CHAIR_FRONT', 24, 17),
-  place('WOODEN_CHAIR_FRONT', 25, 17),
-
   // Dispatch corner (bottom-left) — whiteboard with delivery info
   place('WHITEBOARD', 1, 16),
 
@@ -191,13 +174,13 @@ const furniture: PlacedFurniture[] = [
   // behind the tie guy (north of him on the counter band) so it reads
   // as standing decoration behind the diner without crowding him.
   place('PLANT', 12, 9),  // behind tie guy on the counter band
-  place('PLANT', 27, 17), // bottom-right corner
+  place('PLANT', 20, 17), // bottom-right corner (tight room)
   place('PLANT', 1, 11),  // left wall by big table
-  place('PLANT', 27, 4),  // upper-right corner of new open dining
+  place('PLANT', 20, 4),  // upper-right by east wall
   place('PLANT', 14, 5),  // upper-mid open area
   place('PLANT', 6, 17),  // bottom-left dispatch area
-  place('CACTUS', 22, 11), // by the open central walkway
-  place('BIN', 27, 18),
+  place('CACTUS', 18, 11), // by the open central walkway
+  place('BIN', 20, 18),
   place('COFFEE', 11, 1),
 ];
 
@@ -212,10 +195,10 @@ const interactables: Interactable[] = [
   // Courier-style station near the whiteboard — covers delivery time +
   // 60-minute promise.
   { id: 'dispatch', col: 2, row: 18, label: 'Доставка' },
-  // Regions chart sits on the big communal table — placed BELOW the
-  // table (the south side, now wide open after the table was moved up).
-  // Player approaches from the south dining floor.
-  { id: 'regions', col: 12, row: 15, label: 'Карта России' },
+  // Two stations south of the big communal table — lower-left and
+  // lower-right floor tiles by the table's corners (table at col 11 row 11).
+  { id: 'capitals', col: 10, row: 15, label: 'Москва и Петербург' },
+  { id: 'regions', col: 14, row: 15, label: 'Карта России' },
   // Dodster quiz — visualised by the burrito on the east side of the
   // big table. Player can approach from north, east, or the table's
   // top decorative row.
@@ -235,19 +218,18 @@ const characters = [
   createCharacter({
     id: 'sasha',
     paletteIndex: 4,
-    col: 20,
+    col: 18,
     row: 16,
     isPlayer: true,
     name: 'Саша',
     dir: Direction.UP,
   }),
-  // Vika (manager) — palette 1 (blonde girl). Stationed east of the
-  // cash booth in the open upper-right dining area, wandering between
-  // the customer tables.
+  // Vika (manager) — palette 1 (blonde girl). East of the cash booth;
+  // room was narrowed, so she stays near the east wall tables area.
   createCharacter({
     id: 'vika',
     paletteIndex: 1,
-    col: 23,
+    col: 19,
     row: 4,
     name: 'Вика',
     dir: Direction.DOWN,

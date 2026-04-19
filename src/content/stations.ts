@@ -39,7 +39,7 @@ export function getStationSteps(station: Station): StationStep[] {
 /**
  * IMPORTANT: station ids must match the `id` of interactables placed in
  * `scene/pizzeriaLayout.ts`. Currently: oven, dough, ingredients, sauces,
- * register, dispatch.
+ * register, dispatch, dodster, capitals, regions.
  *
  * Teammates: drop your infographics into `public/infographics/` and reference
  * by `/infographics/<file>.png`, OR replace `kind: 'image'` with
@@ -246,10 +246,10 @@ export const STATIONS: Station[] = [
     },
   },
   {
-    id: 'regions',
-    label: 'Карта России',
+    id: 'capitals',
+    label: 'Москва и Петербург',
     intro:
-      'За одним столом — гости из Владивостока, Казани и Красноярска. Сначала сравним две столицы по додстерам на графике.',
+      'За одним столом — гости из Владивостока, Казани и Красноярска. А про Москву и Питер все забыли? Кто из этих двух городов потребляет больше додстеров?',
     infographic: {
       kind: 'image',
       src: '/img/dodster.png',
@@ -264,61 +264,45 @@ export const STATIONS: Station[] = [
       explain:
         'Да — по данным разница между столицами превышает 5%. Питеру нужно поднажать!',
     },
-    steps: [
-      {
-        infographic: {
-          kind: 'image',
-          src: '/img/dodster.png',
-          caption: 'Покупки додстеров: Москва vs Санкт-Петербург',
-          alt: 'График покупок додстеров в двух столицах',
-        },
-        quiz: {
-          question:
-            'Разница в покупке додстеров между Москвой и Петербургом больше 5%?',
-          options: ['Да', 'Нет'],
-          correctIndex: 0,
-          explain:
-            'Да — по данным разница между столицами превышает 5%: Москва и Петербург близки по масштабу рынка, но не совпадают до процента.',
-        },
+  },
+  {
+    id: 'regions',
+    label: 'Карта России',
+    intro: 'Средняя выручка на пиццерию по разным субъектам РФ.',
+    infographic: {
+      kind: 'pixelChart',
+      caption: 'Средняя выручка на пиццерию по субъектам РФ, млн ₽ за период',
+      chart: {
+        type: 'hbar',
+        // Sorted by value descending so the Far East surprise is visible at a glance.
+        data: [
+          { label: 'Дальневосточный ФО', value: 7.05 },
+          { label: 'Уральский ФО', value: 5.69 },
+          { label: 'Санкт-Петербург', value: 5.24 },
+          { label: 'Северо-Западный ФО', value: 4.88 },
+          { label: 'Москва', value: 4.85 },
+          { label: 'Сибирский ФО', value: 4.64 },
+          { label: 'Ленинградская область', value: 4.53 },
+          { label: 'Приволжский ФО', value: 4.52 },
+          { label: 'Московская область', value: 4.05 },
+          { label: 'Южный ФО', value: 3.84 },
+          { label: 'Центральный ФО', value: 3.28 },
+          { label: 'Северо-Кавказский ФО', value: 2.79 },
+        ],
+        unit: 'млн ₽',
       },
-      {
-        intro: 'Средняя выручка на пиццерию по разным субъектам РФ.',
-        infographic: {
-          kind: 'pixelChart',
-          caption: 'Средняя выручка на пиццерию по субъектам РФ, млн ₽ за период',
-          chart: {
-            type: 'hbar',
-            // Sorted by value descending so the Far East surprise is visible at a glance.
-            data: [
-              { label: 'Дальневосточный ФО', value: 7.05 },
-              { label: 'Уральский ФО', value: 5.69 },
-              { label: 'Санкт-Петербург', value: 5.24 },
-              { label: 'Северо-Западный ФО', value: 4.88 },
-              { label: 'Москва', value: 4.85 },
-              { label: 'Сибирский ФО', value: 4.64 },
-              { label: 'Ленинградская область', value: 4.53 },
-              { label: 'Приволжский ФО', value: 4.52 },
-              { label: 'Московская область', value: 4.05 },
-              { label: 'Южный ФО', value: 3.84 },
-              { label: 'Центральный ФО', value: 3.28 },
-              { label: 'Северо-Кавказский ФО', value: 2.79 },
-            ],
-            unit: 'млн ₽',
-          },
-        },
-        quiz: {
-          question: 'Какой регион приносит наибольший доход?',
-          options: [
-            'Москва',
-            'Санкт-Петербург',
-            'Дальневосточный ФО',
-            'Не хватает данных',
-          ],
-          correctIndex: 2,
-          explain:
-            'Дальневосточный ФО — лидер по этой метрике: там Додо стала массовым брендом, а выручка на точку выше из-за расстояний и крупных семейных заказов.',
-        },
-      },
-    ],
+    },
+    quiz: {
+      question: 'Какой регион приносит наибольший доход?',
+      options: [
+        'Москва',
+        'Санкт-Петербург',
+        'Дальневосточный ФО',
+        'Не хватает данных',
+      ],
+      correctIndex: 3,
+      explain:
+        'Чтобы сравнивать доход, информации только о выручке недостаточно. Ещё нужно знать, сколько было затрат при производстве продукта.',
+    },
   },
 ];
