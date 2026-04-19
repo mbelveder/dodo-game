@@ -87,8 +87,10 @@ const furniture: PlacedFurniture[] = [
   place('SMALL_TABLE_FRONT', 2, 6), // ИНГРИДИЕНТЫ — small prep table
   place('SMALL_TABLE_FRONT', 7, 6), // САЛАТЫ / sauces
 
-  // Counter row (row 9): cash register PC at counter
+  // Counter row (row 9): cash register PC at counter, with a stack of
+  // pixel-art cash bills filling the interactable tile right below it.
   place('PC_FRONT', 17, 8),
+  place('CASH', 17, 10),
 
   // Back office (cols 14-20, rows 1-4): Vika's desk
   place('TABLE_FRONT', 14, 1), // Vika's desk
@@ -121,18 +123,19 @@ const furniture: PlacedFurniture[] = [
   place('WOODEN_CHAIR_FRONT', 24, 14),
   place('WOODEN_CHAIR_FRONT', 25, 14),
 
-  // Big communal table in the middle of the dining room. Diners sit on
-  // three sides — north, west, east — and the south side (closest to the
-  // viewer) is left open. There's a fresh pizza on the table.
+  // Big communal table moved 4 squares higher — now sits in the upper
+  // half of the dining hall (rows 11-14). Diners sit on three sides —
+  // north, west, east — and the south side (closest to the viewer) is
+  // left open. There's a fresh pizza on the table.
   // TABLE_FRONT = 3 cols × 4 rows footprint, top row decorative.
   // SOFA_FRONT spans 2 tiles north of the table; SOFA_SIDE flanks east and
   // west. The side sofas are mirrored so their back-rest faces AWAY from
   // the table (so a seated diner faces inward toward the food).
-  place('SOFA_FRONT', 11, 14),
-  place('SOFA_SIDE', 10, 16),       // west sofa: back faces west (away)
-  place('SOFA_SIDE', 14, 16, true), // east sofa: back faces east (away — mirrored)
-  place('TABLE_FRONT', 11, 15),
-  place('PIZZA', 11, 17),
+  place('SOFA_FRONT', 11, 10),
+  place('SOFA_SIDE', 10, 12),       // west sofa: back faces west (away)
+  place('SOFA_SIDE', 14, 12, true), // east sofa: back faces east (away — mirrored)
+  place('TABLE_FRONT', 11, 11),
+  place('PIZZA', 11, 13),
 
   // Dispatch corner (bottom-left) — whiteboard with delivery info
   place('WHITEBOARD', 1, 16),
@@ -160,10 +163,10 @@ const interactables: Interactable[] = [
   // Courier-style station near the whiteboard — covers delivery time +
   // 60-minute promise.
   { id: 'dispatch', col: 2, row: 18, label: 'Доставка' },
-  // Regions chart sits on the big communal table — placed above the
-  // table on the right (north-east corner) so the player can approach
-  // from the open dining floor north or east of the table.
-  { id: 'regions', col: 14, row: 14, label: 'Карта России' },
+  // Regions chart sits on the big communal table — placed BELOW the
+  // table (the south side, now wide open after the table was moved up).
+  // Player approaches from the south dining floor.
+  { id: 'regions', col: 12, row: 15, label: 'Карта России' },
 ];
 
 // ── Characters ─────────────────────────────────────────────────────
@@ -173,12 +176,14 @@ const interactables: Interactable[] = [
 //   3 older with white hair (suit)     4 boy without tie     5 person with red dress
 // Six unique palettes for six characters.
 const characters = [
-  // Sasha (player) — palette 4 (the guy without a tie)
+  // Sasha (player) — palette 4 (the guy without a tie). Spawns south of
+  // the moved-up table in the open dining area so he can see the whole
+  // pizzeria at the start.
   createCharacter({
     id: 'sasha',
     paletteIndex: 4,
-    col: 14,
-    row: 11,
+    col: 20,
+    row: 16,
     isPlayer: true,
     name: 'Саша',
     dir: Direction.UP,
@@ -211,27 +216,25 @@ const characters = [
   // viewer is empty). Each diner is from a different federal district
   // and is placed sitting on a sofa.
 
-  // North side — Far East (Дальневосточный ФО). Sits on the north sofa
-  // (col 12, row 14). The sofa is rendered with a +8 px y-offset so it
-  // hugs the table, and the seated drop pulls the diner forward so he
-  // looks like he's leaning over the food.
+  // Diner positions track the moved table (table now at rows 11-14).
+
+  // North side — Far East (Дальневосточный ФО)
   createCharacter({
     id: 'diner_far_east',
     paletteIndex: 0,
     col: 12,
-    row: 14,
+    row: 10,
     name: 'Гость из Владивостока',
     dir: Direction.DOWN,
     wanders: false,
     seated: true,
   }),
-  // West side — Volga (Приволжский ФО) — palette 2 (afro orange) so Vika
-  // and Volga don't share the blonde sprite.
+  // West side — Volga (Приволжский ФО) — palette 2 (afro orange)
   createCharacter({
     id: 'diner_volga',
     paletteIndex: 2,
     col: 10,
-    row: 16,
+    row: 12,
     name: 'Гость из Казани',
     dir: Direction.RIGHT,
     wanders: false,
@@ -242,8 +245,8 @@ const characters = [
     id: 'diner_siberia',
     paletteIndex: 5,
     col: 14,
-    row: 16,
-    name: 'Гость из Новосибирска',
+    row: 12,
+    name: 'Гость из Красноярска',
     dir: Direction.LEFT,
     wanders: false,
     seated: true,

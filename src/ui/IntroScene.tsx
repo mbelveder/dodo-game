@@ -6,10 +6,9 @@ import {
   CHAR_W,
   getCharacterSheet,
   getCharFrameRect,
-  typeFrameIdx,
   walkFrameIdx,
 } from '../engine/sprites';
-import { CharacterState, Direction } from '../engine/types';
+import { Direction } from '../engine/types';
 
 interface IntroSceneProps {
   /** Whether Sasha is on stage */
@@ -22,12 +21,14 @@ interface IntroSceneProps {
   vikaBubble: string | null;
 }
 
-const STAGE_W = 720;
-const STAGE_H = 240;
+// Stage sized for 2× speech bubbles — comfortable but not overpowering.
+// Extra headroom on top so multi-line bubbles never overlap the characters.
+const STAGE_W = 960;
+const STAGE_H = 440;
 const SCENE_ZOOM = 4;
 const SASHA_X = STAGE_W * 0.32;
 const VIKA_X = STAGE_W * 0.68;
-const FLOOR_Y = STAGE_H - 60;
+const FLOOR_Y = STAGE_H - 70;
 
 /**
  * Mini-canvas that renders Sasha and Vika side-by-side during the intro.
@@ -85,22 +86,27 @@ function drawScene(
     }
   }
 
-  // Sasha — palette 4. Idle walk frame 0, gentle bob.
+  // Sasha — palette 4 (no tie). Standing pose with a slow walk-frame
+  // shuffle so he feels alive.
   if (s.showSasha) {
-    drawCharacter(ctx, 4, Direction.DOWN, walkFrameIdx(0), SASHA_X, FLOOR_Y, t);
+    drawCharacter(ctx, 4, Direction.DOWN, walkFrameIdx(Math.floor(t * 1.6)), SASHA_X, FLOOR_Y, t);
   }
-  // Vika — palette 1 (the blonde girl). Type animation (frames 3↔4) so
-  // she feels animated.
+  // Vika — palette 1 (the blonde girl). Standing pose with a slightly
+  // faster shuffle so she's visibly animated. Walk frames keep the
+  // character full-height (legs visible); the typing frames hide the
+  // legs and made Vika look truncated.
   if (s.showVika) {
-    const vFrame = typeFrameIdx(Math.floor(t * 2.5));
-    drawCharacter(ctx, 1, Direction.DOWN, vFrame, VIKA_X, FLOOR_Y, t);
+    drawCharacter(ctx, 1, Direction.DOWN, walkFrameIdx(Math.floor(t * 2)), VIKA_X, FLOOR_Y, t);
   }
 
+  // Bubble anchor sits well above each character's head so multi-line
+  // bubbles never crash into the sprite.
+  const bubbleAnchorY = FLOOR_Y - CHAR_H * SCENE_ZOOM - 32;
   if (s.showSasha && s.sashaBubble) {
-    drawBubble(ctx, s.sashaBubble, SASHA_X, FLOOR_Y - CHAR_H * SCENE_ZOOM - 8);
+    drawBubble(ctx, s.sashaBubble, SASHA_X, bubbleAnchorY);
   }
   if (s.showVika && s.vikaBubble) {
-    drawBubble(ctx, s.vikaBubble, VIKA_X, FLOOR_Y - CHAR_H * SCENE_ZOOM - 8);
+    drawBubble(ctx, s.vikaBubble, VIKA_X, bubbleAnchorY);
   }
 }
 
@@ -124,11 +130,12 @@ function drawCharacter(
   ctx.drawImage(f.source, f.sx, f.sy, f.sw, f.sh, x, y, drawW, drawH);
 }
 
-const BUBBLE_FONT_PX = 18;
-const BUBBLE_PAD_X = 12;
-const BUBBLE_PAD_Y = 10;
-const BUBBLE_LINE_H = 22;
-const BUBBLE_MAX_WIDTH = 360;
+// Bubble text sized 2× the original baseline.
+const BUBBLE_FONT_PX = 36;
+const BUBBLE_PAD_X = 24;
+const BUBBLE_PAD_Y = 20;
+const BUBBLE_LINE_H = 44;
+const BUBBLE_MAX_WIDTH = 720;
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const words = text.split(/\s+/);

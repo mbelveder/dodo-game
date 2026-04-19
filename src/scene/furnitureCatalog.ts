@@ -145,6 +145,19 @@ const CATALOG: Record<string, FurnitureDef> = {
     footprintH: 1,
     surface: true,
   },
+  // Pixel-art cash that fills the register tile. Walkable
+  // (backgroundTiles=1) so the player can still stand on the register
+  // square; surface=true so it draws on top of the floor.
+  CASH: {
+    id: 'CASH',
+    src: 'synthetic://cash',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+    backgroundTiles: 1,
+    surface: true,
+  },
   // Sofas around the big communal table. SOFA_FRONT shows the back-rest at
   // the top (used when characters sit south of the back-rest, facing south).
   // SOFA_SIDE is a side-profile (used for east/west seating, mirrored for the

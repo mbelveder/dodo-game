@@ -209,11 +209,15 @@ export function renderFrame(
   drawables.sort((a, b) => a.zY - b.zY);
   for (const d of drawables) d.draw();
 
-  // Speech bubbles drawn on top in DOM-pixel space (still scaled by ZOOM)
+  // Speech bubbles drawn on top in DOM-pixel space (still scaled by ZOOM).
+  // Bubble anchor follows the character's *visual* head, accounting for the
+  // seated drop, so seated diners' bubbles sit just above their heads
+  // instead of floating high above the un-seated position.
   for (const ch of state.characters) {
     if (!ch.bubble) continue;
+    const seatedDrop = ch.seated ? 10 : 0;
     const px = offsetX + ch.x * ZOOM;
-    const py = offsetY + (ch.y - CHAR_H + TILE_SIZE / 2 - 4) * ZOOM;
+    const py = offsetY + (ch.y - CHAR_H + TILE_SIZE / 2 + seatedDrop - 2) * ZOOM;
     drawSpeechBubble(ctx, ch.bubble.text, px, py, ch.bubble.remaining);
   }
 }
@@ -337,11 +341,13 @@ function drawPlayerMarker(ctx: CanvasRenderingContext2D, cx: number, cy: number)
 
 // ── Speech bubble ──────────────────────────────────────────────────
 
-const BUBBLE_FONT_PX = 18;
-const BUBBLE_PAD_X = 10;
-const BUBBLE_PAD_Y = 8;
-const BUBBLE_LINE_H = 21;
-const BUBBLE_MAX_WIDTH_PX = 320;
+// In-game speech bubbles — sized to be readable across the room without
+// dominating the screen.
+const BUBBLE_FONT_PX = 26;
+const BUBBLE_PAD_X = 14;
+const BUBBLE_PAD_Y = 12;
+const BUBBLE_LINE_H = 30;
+const BUBBLE_MAX_WIDTH_PX = 480;
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const words = text.split(/\s+/);
@@ -383,25 +389,25 @@ function drawSpeechBubble(
   const fade = Math.min(1, remaining / BUBBLE_FADE_SEC);
   ctx.globalAlpha = fade;
 
-  // Black outline
+  // Black outline (scaled to match the font)
   ctx.fillStyle = '#000';
-  ctx.fillRect(x - 2, y - 2, w + 4, h + 4);
+  ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
   // White body
   ctx.fillStyle = '#FFF7E6';
   ctx.fillRect(x, y, w, h);
   // Tail
   ctx.fillStyle = '#000';
   ctx.beginPath();
-  ctx.moveTo(anchorX - 5, y + h);
-  ctx.lineTo(anchorX + 5, y + h);
-  ctx.lineTo(anchorX, y + h + 7);
+  ctx.moveTo(anchorX - 7, y + h);
+  ctx.lineTo(anchorX + 7, y + h);
+  ctx.lineTo(anchorX, y + h + 10);
   ctx.closePath();
   ctx.fill();
   ctx.fillStyle = '#FFF7E6';
   ctx.beginPath();
-  ctx.moveTo(anchorX - 3, y + h);
-  ctx.lineTo(anchorX + 3, y + h);
-  ctx.lineTo(anchorX, y + h + 4);
+  ctx.moveTo(anchorX - 4, y + h);
+  ctx.lineTo(anchorX + 4, y + h);
+  ctx.lineTo(anchorX, y + h + 6);
   ctx.closePath();
   ctx.fill();
 

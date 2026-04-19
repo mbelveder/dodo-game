@@ -220,9 +220,14 @@ export function registerSyntheticSprite(src: string, canvas: HTMLCanvasElement):
   furnitureCanvases.set(src, canvas);
 }
 
-/** Build the procedural pixel-art pizza sprite (32×16) — a wood board with
- *  a cheesy pepperoni pizza on top. Idempotent. */
+/** Build all procedural pixel-art sprites that the catalog references via
+ *  `synthetic://...` paths. Idempotent. */
 export function buildSyntheticSprites(): void {
+  buildPizza();
+  buildCash();
+}
+
+function buildPizza(): void {
   if (furnitureCanvases.has('synthetic://pizza')) return;
   const c = document.createElement('canvas');
   c.width = 32;
@@ -256,6 +261,59 @@ export function buildSyntheticSprites(): void {
   // Crust shadow on bottom edge
   for (let x = 6; x <= 26; x++) putPixel(ctx, x, 12, '#5e3a18');
   registerSyntheticSprite('synthetic://pizza', c);
+}
+
+/** A 16×16 pixel "cash" tile — a single fat dollar bill that fills the
+ *  entire tile, with a chunky $ symbol in the middle. */
+function buildCash(): void {
+  if (furnitureCanvases.has('synthetic://cash')) return;
+  const c = document.createElement('canvas');
+  c.width = 16;
+  c.height = 16;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+
+  // Fill whole tile with a green bill: dark outer outline, mid-green
+  // edge band, and a lighter green inner panel.
+  ctx.fillStyle = '#0e3e1a'; // dark outline
+  ctx.fillRect(0, 0, 16, 16);
+  ctx.fillStyle = '#1f7a3a'; // mid green edge band
+  ctx.fillRect(1, 1, 14, 14);
+  ctx.fillStyle = '#9dd9a8'; // light green inner
+  ctx.fillRect(2, 2, 12, 12);
+  // Subtle inner border line for the "engraved" bill look
+  ctx.fillStyle = '#1a5a2a';
+  ctx.fillRect(3, 3, 10, 1);
+  ctx.fillRect(3, 12, 10, 1);
+  ctx.fillRect(3, 3, 1, 10);
+  ctx.fillRect(12, 3, 1, 10);
+
+  // Big bold $ symbol centered around (8, 8). Drawn with thick 2-px
+  // strokes so it reads at game zoom.
+  const dark = '#0e3e1a';
+  // Vertical stem (2 px wide, 8 px tall) through the middle
+  ctx.fillStyle = dark;
+  ctx.fillRect(7, 4, 2, 8);
+  // Top of S — top horizontal cap
+  ctx.fillRect(5, 5, 6, 1);
+  // Top-left curl of S
+  ctx.fillRect(5, 5, 1, 2);
+  // Middle horizontal bar
+  ctx.fillRect(5, 7, 6, 1);
+  // Bottom-right curl of S
+  ctx.fillRect(10, 8, 1, 2);
+  // Bottom horizontal cap
+  ctx.fillRect(5, 10, 6, 1);
+
+  // Tiny corner marks evoking serial numbers / denomination
+  ctx.fillStyle = dark;
+  putPixel(ctx, 4, 4, dark);
+  putPixel(ctx, 11, 4, dark);
+  putPixel(ctx, 4, 11, dark);
+  putPixel(ctx, 11, 11, dark);
+
+  registerSyntheticSprite('synthetic://cash', c);
 }
 
 function putPixel(ctx: CanvasRenderingContext2D, x: number, y: number, color: string): void {

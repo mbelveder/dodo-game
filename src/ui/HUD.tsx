@@ -28,7 +28,7 @@ export function HUD({ completed, total, promptLabel }: HUDProps) {
 
 function PixelPizzaIcon() {
   // Inline 8x8 pixel "pizza slice" via SVG rects
-  const px = 3;
+  const px = 4;
   const pixels: Array<[number, number, string]> = [
     [3, 0, '#FFD23F'],
     [4, 0, '#FFD23F'],

@@ -123,20 +123,20 @@ button:focus-visible {
     0 0 0 4px var(--dodo-cream),
     0 0 0 8px var(--dodo-charcoal),
     8px 8px 0 8px rgba(0, 0, 0, 0.4);
-  padding: 22px 28px 18px;
-  font-size: 24px;
+  padding: 24px 30px 20px;
+  font-size: 30px;
   line-height: 1.5;
 }
 
 .dialogueSpeaker {
-  font-size: 21px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  margin-bottom: 12px;
   font-weight: 700;
   letter-spacing: 2px;
 }
 
 .dialogueText {
-  min-height: 100px;
+  min-height: 120px;
 }
 
 /* Compact dialogue box: used when the line is already shown as a speech
@@ -240,11 +240,11 @@ button:focus-visible {
   background: var(--dodo-cream);
   color: var(--dodo-charcoal);
   border: 3px solid var(--dodo-charcoal);
-  padding: 10px 16px;
+  padding: 14px 22px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 21px;
+  gap: 14px;
+  font-size: 28px;
   box-shadow: 4px 4px 0 0 var(--dodo-charcoal);
   pointer-events: auto;
 }
@@ -252,9 +252,9 @@ button:focus-visible {
 .hudHint {
   background: rgba(0, 0, 0, 0.6);
   color: var(--dodo-cream);
-  padding: 8px 14px;
+  padding: 12px 18px;
   border: 2px solid var(--dodo-cream);
-  font-size: 17px;
+  font-size: 22px;
   letter-spacing: 0.5px;
 }
 
