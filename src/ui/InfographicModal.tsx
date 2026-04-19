@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { getStationSteps, type Station } from '../content/stations';
-import { Infographic } from './Infographic';
+import { Infographic, withBase } from './Infographic';
 import { Quiz } from './Quiz';
 
 interface InfographicModalProps {
@@ -18,6 +18,19 @@ export function InfographicModal({ station, onAnswer, onClose }: InfographicModa
   useEffect(() => {
     setStepIndex(0);
     setPrevCorrect([]);
+  }, [station.id]);
+
+  useEffect(() => {
+    const url = withBase('/sound/dodo_sound.mp3');
+    const audio = new Audio(url);
+    audio.volume = 0.5;
+    void audio.play().catch(() => {
+      // Autoplay policy or missing file — ignore silently.
+    });
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
   }, [station.id]);
 
   const step = steps[stepIndex]!;

@@ -7,7 +7,7 @@ interface InfographicProps {
 
 /** Prefix Vite's BASE_URL to absolute-rooted paths so infographics resolve
  *  correctly under GitHub Pages' subfolder. Leaves http(s):// URLs alone. */
-function withBase(src: string): string {
+export function withBase(src: string): string {
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) {
     return src;
   }
