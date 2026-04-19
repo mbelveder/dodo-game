@@ -38,8 +38,8 @@ export function getStationSteps(station: Station): StationStep[] {
 
 /**
  * IMPORTANT: station ids must match the `id` of interactables placed in
- * `scene/pizzeriaLayout.ts`. Currently: register, dispatch, dodster,
- * capitals, tile_map, regions, holidays.
+ * `scene/pizzeriaLayout.ts`. Currently: register, dispatch, capitals,
+ * tile_map, regions, holidays.
  *
  * Teammates: drop your infographics into `public/infographics/` and reference
  * by `/infographics/<file>.png`, OR replace `kind: 'image'` with
@@ -90,26 +90,6 @@ export const STATIONS: Station[] = [
       correctIndex: 1,
       explain:
         'В зале гости чаще добавляют напитки и десерты к основному заказу; в доставке упор сильнее на «основу», поэтому суммарная доля этих категорий в ресторанах выше.',
-    },
-  },
-  {
-    id: 'dodster',
-    label: 'Додстеры',
-    intro:
-      'На столе — додстер в фольге. Расстояние между двумя столицами измеряют и в километрах, и в долях меню.',
-    infographic: {
-      kind: 'image',
-      src: '/img/dodster.png',
-      caption: 'Додстер в фольге — визитная карточка меню',
-      alt: 'Додстер, завёрнутый в фольгу',
-    },
-    quiz: {
-      question:
-        'Сколько километров примерно от Москвы до Санкт-Петербурга по основным автомагистралям (порядок величины)?',
-      options: ['Около 400 км', 'Около 700 км', 'Около 1100 км', 'Около 1500 км'],
-      correctIndex: 1,
-      explain:
-        'Около 700 км по дороге — типичный масштаб логистики между двумя крупнейшими рынками Додо.',
     },
   },
   {

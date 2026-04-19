@@ -107,8 +107,7 @@ const furniture: PlacedFurniture[] = [
   place('PIZZA', 11, 13),       // classic red pizza, middle-left
   place('PIZZA_GREEN', 12, 12), // pesto/green pizza, top-right (off the
                                 // south edge of the table)
-  place('BURRITO', 13, 13),     // foil-wrapped burrito — also the
-                                // station sign for the dodster quiz
+  place('BURRITO', 13, 13),     // foil-wrapped burrito on the communal table
 
   // ── Dining tables ────────────────────────────────────────────────
   // Each small table has chairs on BOTH north and south sides — full
@@ -184,10 +183,6 @@ const interactables: Interactable[] = [
   { id: 'capitals', col: 10, row: 15, label: 'Москва и Петербург' },
   { id: 'tile_map', col: 12, row: 15, label: 'Карты регионов' },
   { id: 'regions', col: 14, row: 15, label: 'Карта России' },
-  // Dodster quiz — visualised by the burrito on the east side of the
-  // big table. Player can approach from north, east, or the table's
-  // top decorative row.
-  { id: 'dodster', col: 13, row: 13, label: 'Додстеры' },
   // Holiday ordering quiz — east dining strip below the counter band.
   { id: 'holidays', col: 14, row: 10, label: 'Праздники' },
 ];

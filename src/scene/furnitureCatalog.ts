@@ -169,8 +169,7 @@ const CATALOG: Record<string, FurnitureDef> = {
     backgroundTiles: 1,
     surface: true,
   },
-  // Pixel burrito half-wrapped in foil — used as the visible "station
-  // sign" at the cash register (a customer's order on the counter).
+  // Pixel burrito half-wrapped in foil — table prop on the communal table.
   BURRITO: {
     id: 'BURRITO',
     src: 'synthetic://burrito',

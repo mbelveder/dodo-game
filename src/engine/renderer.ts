@@ -98,17 +98,11 @@ export function renderFrame(
     }
   }
 
-  // Interactable highlights:
-  //  - Most stations: yellow triangle (later) + pulsing yellow ring while pending.
-  //  - `dodster` on the communal table: no yellow (burrito sprite is the cue);
-  //    when in range, a subtle orange ring only; completed still uses green + tick.
-  //  - Completed stations: solid green ring + pixel tick.
+  // Interactable highlights: pulsing yellow ring while pending; green + tick when done.
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 350);
   for (const it of state.interactables) {
     const isActive = it.id === state.activePromptId;
     const isCompleted = state.completedStationIds.has(it.id);
-    const isTableDodster = it.id === 'dodster';
-    const skipYellowDecor = isTableDodster && !isCompleted;
 
     if (isCompleted) {
       ctx.strokeStyle = DODO_PALETTE.green;
@@ -120,7 +114,7 @@ export function renderFrame(
         ctx.strokeRect(offsetX + it.col * s - 2, offsetY + it.row * s - 2, s + 4, s + 4);
       }
       drawCompletedTick(ctx, offsetX + it.col * s, offsetY + it.row * s, s);
-    } else if (!skipYellowDecor) {
+    } else {
       ctx.strokeStyle = DODO_PALETTE.yellow;
       ctx.lineWidth = Math.max(2, ZOOM);
       ctx.globalAlpha = isActive ? 0.55 + pulse * 0.45 : 0.18 + pulse * 0.18;
@@ -129,11 +123,6 @@ export function renderFrame(
         ctx.globalAlpha = 0.35 + pulse * 0.35;
         ctx.strokeRect(offsetX + it.col * s - 2, offsetY + it.row * s - 2, s + 4, s + 4);
       }
-    } else if (isActive) {
-      ctx.strokeStyle = DODO_PALETTE.orange;
-      ctx.lineWidth = Math.max(2, ZOOM);
-      ctx.globalAlpha = 0.4 + pulse * 0.35;
-      ctx.strokeRect(offsetX + it.col * s + 1, offsetY + it.row * s + 1, s - 2, s - 2);
     }
   }
   ctx.globalAlpha = 1;
@@ -220,10 +209,8 @@ export function renderFrame(
   drawables.sort((a, b) => a.zY - b.zY);
   for (const d of drawables) d.draw();
 
-  // Yellow waypoint triangles above station tiles (after furniture). The
-  // table dodster tile is skipped — the burrito prop already marks the spot.
+  // Yellow waypoint triangles above station tiles (after furniture).
   for (const it of state.interactables) {
-    if (it.id === 'dodster') continue;
     const cx = offsetX + it.col * s + s / 2;
     const cy = offsetY + it.row * s - 2 * ZOOM;
     drawStationTriangleMarker(ctx, cx, cy);
