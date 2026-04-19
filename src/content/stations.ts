@@ -12,6 +12,14 @@ export interface QuizQuestion {
   explain: string;
 }
 
+/** One infographic + quiz; used alone or as part of `Station.steps`. */
+export interface StationStep {
+  /** Extra lead-in for this step (shown under the main station intro when set). */
+  intro?: string;
+  infographic: Infographic;
+  quiz: QuizQuestion;
+}
+
 export interface Station {
   id: string;
   label: string;
@@ -19,6 +27,13 @@ export interface Station {
   intro: string;
   infographic: Infographic;
   quiz: QuizQuestion;
+  /** When present, the modal runs these steps in order (overrides flat infographic/quiz). */
+  steps?: StationStep[];
+}
+
+export function getStationSteps(station: Station): StationStep[] {
+  if (station.steps && station.steps.length > 0) return station.steps;
+  return [{ infographic: station.infographic, quiz: station.quiz }];
 }
 
 /**
@@ -153,34 +168,25 @@ export const STATIONS: Station[] = [
     id: 'register',
     label: 'Касса',
     intro:
-      'Касса — пульс пиццерии. Когда у нас час пик, и сколько клиентов проходит через неё?',
+      'Касса — пульс пиццерии. Чек за чеком, регион за регионом. Изучи статистику средних чеков по стране.',
     infographic: {
-      kind: 'pixelChart',
-      caption: 'Заказы по часам в будний день',
-      chart: {
-        type: 'line',
-        data: [
-          { label: '11', value: 8 },
-          { label: '12', value: 18 },
-          { label: '13', value: 31 },
-          { label: '14', value: 22 },
-          { label: '15', value: 14 },
-          { label: '16', value: 12 },
-          { label: '17', value: 19 },
-          { label: '18', value: 34 },
-          { label: '19', value: 47 },
-          { label: '20', value: 41 },
-          { label: '21', value: 26 },
-        ],
-        unit: 'зак.',
-      },
+      kind: 'image',
+      src: '/img/bill.png',
+      caption: 'Средний чек по федеральным округам и крупным городам',
+      alt: 'Рейтинг регионов по среднему чеку Додо',
     },
     quiz: {
-      question: 'В какое время самый большой пик заказов?',
-      options: ['13:00', '18:00', '19:00', '21:00'],
-      correctIndex: 2,
+      question:
+        'Какой субъект РФ занимает пятое место по размеру среднего чека?',
+      options: [
+        'Приволжский ФО',
+        'Санкт-Петербург',
+        'Центральный ФО',
+        'Сибирский ФО',
+      ],
+      correctIndex: 3,
       explain:
-        '19:00 — главный пик ужина. Второй, поменьше, приходится на обед в 13:00.',
+        'Сибирский ФО уверенно держится в первой пятёрке.',
     },
   },
   {
@@ -220,45 +226,99 @@ export const STATIONS: Station[] = [
     },
   },
   {
-    id: 'regions',
-    label: 'Карта России',
+    id: 'dodster',
+    label: 'Додстеры',
     intro:
-      'За одним столом — гости из Владивостока, Казани и Красноярска. Додо — по всей стране. Где наш фирменный красный пикап встречает клиентов чаще всего?',
+      'На столе — додстер в фольге. Расстояние между двумя столицами измеряют и в километрах, и в долях меню.',
     infographic: {
-      kind: 'pixelChart',
-      caption: 'Средний чек доставки по регионам, млн ₽ за период',
-      chart: {
-        type: 'hbar',
-        // Sorted by value descending so the Far East surprise is visible at a glance.
-        data: [
-          { label: 'Дальневосточный ФО', value: 7.05 },
-          { label: 'Уральский ФО', value: 5.69 },
-          { label: 'Санкт-Петербург', value: 5.24 },
-          { label: 'Северо-Западный ФО', value: 4.88 },
-          { label: 'Москва', value: 4.85 },
-          { label: 'Сибирский ФО', value: 4.64 },
-          { label: 'Ленинградская область', value: 4.53 },
-          { label: 'Приволжский ФО', value: 4.52 },
-          { label: 'Московская область', value: 4.05 },
-          { label: 'Южный ФО', value: 3.84 },
-          { label: 'Центральный ФО', value: 3.28 },
-          { label: 'Северо-Кавказский ФО', value: 2.79 },
-        ],
-        unit: 'млн ₽',
-      },
+      kind: 'image',
+      src: '/img/dodster.png',
+      caption: 'Додстер в фольге — визитная карточка меню',
+      alt: 'Додстер, завёрнутый в фольгу',
     },
     quiz: {
       question:
-        'В каком регионе России Додо собирает самую большую выручку?',
-      options: [
-        'Москва',
-        'Санкт-Петербург',
-        'Дальневосточный ФО',
-        'Уральский ФО',
-      ],
-      correctIndex: 2,
+        'Сколько километров примерно от Москвы до Санкт-Петербурга по основным автомагистралям (порядок величины)?',
+      options: ['Около 400 км', 'Около 700 км', 'Около 1100 км', 'Около 1500 км'],
+      correctIndex: 1,
       explain:
-        'Сюрприз! Дальневосточный ФО опережает обе столицы — там Додо стала по-настоящему массовым брендом, и средний чек выше из-за расстояний и крупных семейных заказов.',
+        'Около 700 км по дороге — типичный масштаб логистики между двумя крупнейшими рынками Додо.',
     },
+  },
+  {
+    id: 'regions',
+    label: 'Карта России',
+    intro:
+      'За одним столом — гости из Владивостока, Казани и Красноярска. Сначала сравним две столицы по додстерам на графике.',
+    infographic: {
+      kind: 'image',
+      src: '/img/dodster.png',
+      caption: 'Покупки додстеров: Москва vs Санкт-Петербург',
+      alt: 'График покупок додстеров в двух столицах',
+    },
+    quiz: {
+      question:
+        'Разница в покупке додстеров между Москвой и Петербургом больше 5%?',
+      options: ['Да', 'Нет'],
+      correctIndex: 0,
+      explain:
+        'Да — по данным разница между столицами превышает 5%. Питеру нужно поднажать!',
+    },
+    steps: [
+      {
+        infographic: {
+          kind: 'image',
+          src: '/img/dodster.png',
+          caption: 'Покупки додстеров: Москва vs Санкт-Петербург',
+          alt: 'График покупок додстеров в двух столицах',
+        },
+        quiz: {
+          question:
+            'Разница в покупке додстеров между Москвой и Петербургом больше 5%?',
+          options: ['Да', 'Нет'],
+          correctIndex: 0,
+          explain:
+            'Да — по данным разница между столицами превышает 5%: Москва и Петербург близки по масштабу рынка, но не совпадают до процента.',
+        },
+      },
+      {
+        intro: 'Средняя выручка на пиццерию по разным субъектам РФ.',
+        infographic: {
+          kind: 'pixelChart',
+          caption: 'Средняя выручка на пиццерию по субъектам РФ, млн ₽ за период',
+          chart: {
+            type: 'hbar',
+            // Sorted by value descending so the Far East surprise is visible at a glance.
+            data: [
+              { label: 'Дальневосточный ФО', value: 7.05 },
+              { label: 'Уральский ФО', value: 5.69 },
+              { label: 'Санкт-Петербург', value: 5.24 },
+              { label: 'Северо-Западный ФО', value: 4.88 },
+              { label: 'Москва', value: 4.85 },
+              { label: 'Сибирский ФО', value: 4.64 },
+              { label: 'Ленинградская область', value: 4.53 },
+              { label: 'Приволжский ФО', value: 4.52 },
+              { label: 'Московская область', value: 4.05 },
+              { label: 'Южный ФО', value: 3.84 },
+              { label: 'Центральный ФО', value: 3.28 },
+              { label: 'Северо-Кавказский ФО', value: 2.79 },
+            ],
+            unit: 'млн ₽',
+          },
+        },
+        quiz: {
+          question: 'Какой регион приносит наибольший доход?',
+          options: [
+            'Москва',
+            'Санкт-Петербург',
+            'Дальневосточный ФО',
+            'Уральский ФО',
+          ],
+          correctIndex: 2,
+          explain:
+            'Дальневосточный ФО — лидер по этой метрике: там Додо стала массовым брендом, а выручка на точку выше из-за расстояний и крупных семейных заказов.',
+        },
+      },
+    ],
   },
 ];

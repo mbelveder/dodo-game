@@ -224,7 +224,9 @@ export function registerSyntheticSprite(src: string, canvas: HTMLCanvasElement):
  *  `synthetic://...` paths. Idempotent. */
 export function buildSyntheticSprites(): void {
   buildPizza();
+  buildPizzaGreen();
   buildCash();
+  buildBurrito();
 }
 
 function buildPizza(): void {
@@ -261,6 +263,103 @@ function buildPizza(): void {
   // Crust shadow on bottom edge
   for (let x = 6; x <= 26; x++) putPixel(ctx, x, 12, '#5e3a18');
   registerSyntheticSprite('synthetic://pizza', c);
+}
+
+/** Variant pizza — pesto/green sauce with mozzarella balls, mushrooms,
+ *  and basil. Same shape as the classic pizza but a clearly different
+ *  palette so two pizzas on the same table read as two different pies. */
+function buildPizzaGreen(): void {
+  if (furnitureCanvases.has('synthetic://pizza-green')) return;
+  const c = document.createElement('canvas');
+  c.width = 32;
+  c.height = 16;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+  // Wood board
+  drawPixelOval(ctx, 16, 9, 14, 6, '#8b5a2b');
+  // Crust ring (slightly more golden than classic)
+  drawPixelOval(ctx, 16, 8, 12, 5, '#dca465');
+  // Pesto sauce — bright herb green
+  drawPixelOval(ctx, 16, 8, 10, 4, '#6c9f3a');
+  // White mozzarella balls (cream highlights)
+  putPixel(ctx, 11, 7, '#fff8e0');
+  putPixel(ctx, 13, 6, '#fff8e0');
+  putPixel(ctx, 18, 6, '#fff8e0');
+  putPixel(ctx, 21, 7, '#fff8e0');
+  putPixel(ctx, 12, 9, '#fff8e0');
+  putPixel(ctx, 19, 9, '#fff8e0');
+  // Mushroom slices (warm beige)
+  putPixel(ctx, 10, 8, '#d2a373');
+  putPixel(ctx, 14, 7, '#d2a373');
+  putPixel(ctx, 17, 9, '#d2a373');
+  putPixel(ctx, 20, 7, '#d2a373');
+  putPixel(ctx, 22, 9, '#d2a373');
+  // Darker basil leaves
+  putPixel(ctx, 15, 9, '#2f5e22');
+  putPixel(ctx, 19, 8, '#2f5e22');
+  // Crust shadow on bottom edge
+  for (let x = 6; x <= 26; x++) putPixel(ctx, x, 12, '#5e3a18');
+  registerSyntheticSprite('synthetic://pizza-green', c);
+}
+
+/** A 16×16 pixel burrito held foil-down — the way you actually grip a
+ *  to-go burrito. Top half: warm-brown burrito (the eating end).
+ *  Bottom half: silver foil wrapper with a jagged top edge. */
+function buildBurrito(): void {
+  if (furnitureCanvases.has('synthetic://burrito')) return;
+  const c = document.createElement('canvas');
+  c.width = 16;
+  c.height = 16;
+  const ctx = c.getContext('2d');
+  if (!ctx) return;
+  ctx.imageSmoothingEnabled = false;
+
+  // Burrito body — fat oval across the top half (the eating end)
+  const burritoOutline = '#3a2308';
+  const burritoBody = '#a86a36';
+  const burritoHi = '#c98a52';
+  ctx.fillStyle = burritoOutline;
+  ctx.fillRect(2, 1, 12, 8);
+  ctx.fillStyle = burritoBody;
+  ctx.fillRect(3, 2, 10, 6);
+  // Highlight band along the lower crease
+  ctx.fillStyle = burritoHi;
+  ctx.fillRect(4, 6, 8, 1);
+  // Round the top corners off
+  ctx.clearRect(2, 1, 1, 1);
+  ctx.clearRect(13, 1, 1, 1);
+
+  // Foil — covers the bottom half with a jagged TOP edge (where the
+  // foil tears as you eat down toward the wrapped grip).
+  const foilOutline = '#4d4d4d';
+  const foil = '#bcbcbc';
+  const foilHi = '#f5f5f5';
+  ctx.fillStyle = foilOutline;
+  ctx.fillRect(3, 7, 10, 8);
+  ctx.fillStyle = foil;
+  ctx.fillRect(4, 8, 8, 6);
+  // Crinkle highlights — a couple of bright pixels
+  putPixel(ctx, 5, 11, foilHi);
+  putPixel(ctx, 8, 12, foilHi);
+  putPixel(ctx, 10, 9, foilHi);
+  putPixel(ctx, 6, 13, foilHi);
+  // Jagged foil TOP edge — alternate pixels of foil + cleared makes a
+  // torn/folded edge look
+  ctx.fillStyle = foil;
+  putPixel(ctx, 4, 7, foil);
+  putPixel(ctx, 6, 7, foil);
+  putPixel(ctx, 8, 7, foil);
+  putPixel(ctx, 10, 7, foil);
+  ctx.clearRect(5, 7, 1, 1);
+  ctx.clearRect(7, 7, 1, 1);
+  ctx.clearRect(9, 7, 1, 1);
+  ctx.clearRect(11, 7, 1, 1);
+  // Round the foil's bottom corners off so it doesn't look like a brick
+  ctx.clearRect(3, 14, 1, 1);
+  ctx.clearRect(12, 14, 1, 1);
+
+  registerSyntheticSprite('synthetic://burrito', c);
 }
 
 /** A 16×16 pixel "cash" tile — a single fat dollar bill that fills the

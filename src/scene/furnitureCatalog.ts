@@ -145,12 +145,35 @@ const CATALOG: Record<string, FurnitureDef> = {
     footprintH: 1,
     surface: true,
   },
+  // Pesto/green pizza variant — same shape as PIZZA, different palette
+  // so two pizzas on the same table read as two distinct pies.
+  PIZZA_GREEN: {
+    id: 'PIZZA_GREEN',
+    src: 'synthetic://pizza-green',
+    w: 32,
+    h: 16,
+    footprintW: 2,
+    footprintH: 1,
+    surface: true,
+  },
   // Pixel-art cash that fills the register tile. Walkable
   // (backgroundTiles=1) so the player can still stand on the register
   // square; surface=true so it draws on top of the floor.
   CASH: {
     id: 'CASH',
     src: 'synthetic://cash',
+    w: 16,
+    h: 16,
+    footprintW: 1,
+    footprintH: 1,
+    backgroundTiles: 1,
+    surface: true,
+  },
+  // Pixel burrito half-wrapped in foil — used as the visible "station
+  // sign" at the cash register (a customer's order on the counter).
+  BURRITO: {
+    id: 'BURRITO',
+    src: 'synthetic://burrito',
     w: 16,
     h: 16,
     footprintW: 1,

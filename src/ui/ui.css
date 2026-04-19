@@ -374,6 +374,12 @@ button:focus-visible {
   background: #fffaee;
 }
 
+.modalStepIntroMuted {
+  margin-bottom: 10px;
+  opacity: 0.78;
+  font-size: 0.9em;
+}
+
 .modalGrid {
   display: grid;
   grid-template-columns: minmax(360px, 1fr) minmax(320px, 1fr);

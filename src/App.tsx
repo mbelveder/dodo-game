@@ -93,10 +93,11 @@ export default function App() {
 
   const handleCloseModal = useCallback(() => {
     setOpenStation(null);
-    // Auto-advance to ending if all stations completed
+    // Auto-advance to ending if all stations completed (unique ids, not raw rows)
     setTimeout(() => {
       setCompleted((latest) => {
-        if (latest.length >= STATIONS.length) {
+        const doneIds = new Set(latest.map((c) => c.stationId));
+        if (doneIds.size >= STATIONS.length) {
           setStage('ending');
         }
         return latest;
@@ -139,7 +140,7 @@ export default function App() {
         onInteract={handleInteract}
       />
       <HUD
-        completed={completed.length}
+        completed={completedIds.size}
         total={STATIONS.length}
         promptLabel={
           currentPromptStation
