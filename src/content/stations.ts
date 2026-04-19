@@ -39,7 +39,7 @@ export function getStationSteps(station: Station): StationStep[] {
 /**
  * IMPORTANT: station ids must match the `id` of interactables placed in
  * `scene/pizzeriaLayout.ts`. Currently: oven, dough, ingredients, sauces,
- * register, dispatch, dodster, capitals, regions.
+ * register, dispatch, dodster, capitals, tile_map, regions, holidays.
  *
  * Teammates: drop your infographics into `public/infographics/` and reference
  * by `/infographics/<file>.png`, OR replace `kind: 'image'` with
@@ -258,11 +258,11 @@ export const STATIONS: Station[] = [
     },
     quiz: {
       question:
-        'Разница в покупке додстеров между Москвой и Петербургом больше 5%?',
+        'Разница в потреблении додстеров между Москвой и Петербургом больше, чем в полтора раза?',
       options: ['Да', 'Нет'],
       correctIndex: 0,
       explain:
-        'Да — по данным разница между столицами превышает 5%. Питеру нужно поднажать!',
+        'По любви к додстерам столицы отличаются заметно!',
     },
   },
   {
@@ -303,6 +303,55 @@ export const STATIONS: Station[] = [
       correctIndex: 3,
       explain:
         'Чтобы сравнивать доход, информации только о выручке недостаточно. Ещё нужно знать, сколько было затрат при производстве продукта.',
+    },
+  },
+  {
+    id: 'tile_map',
+    label: 'Карты регионов',
+    intro:
+      '⚠️ Предупреждение системы! Часть данных на картах повреждена ⚠️\n\nНо на этот вопрос вы точно сможете ответить.',
+    infographic: {
+      kind: 'image',
+      src: '/img/tile_map.png',
+      caption: 'Фрагмент тайловой карты присутствия пиццерий',
+      alt: 'Карта регионов с тайлами',
+    },
+    quiz: {
+      question: 'В каком из этих регионов вообще нет пиццерий Додо?',
+      options: [
+        'МАГ (Магаданская область)',
+        'ЧУК (Чукотский автономный округ)',
+        'ПСК (Псковская область)',
+        'Я-Н (Ямало-ненецкий автономный округ)',
+      ],
+      correctIndex: 1,
+      explain:
+        'Чукотский автономный округ — крайний северо-восток с очень малой плотностью сети; на его территории нет точек Додо (данные команды).',
+    },
+  },
+  {
+    id: 'holidays',
+    label: 'Праздники',
+    intro:
+      'Весна в данных Додо — это не только графики, но и два «главных» весенних заказа: 23 февраля и 8 марта. Посмотри, как меняется баланс спроса.',
+    infographic: {
+      kind: 'image',
+      src: '/img/holidays.png',
+      caption: 'Заказы к 8 марта и 23 февраля: динамика перед праздниками',
+      alt: 'Инфографика заказов к 8 марта и 23 февраля',
+    },
+    quiz: {
+      question:
+        'За сколько дней до праздника заказы к 8 марта начинают превышать заказы к 23 февраля?',
+      options: [
+        'За 5 дней',
+        'За 3 дня',
+        'За 2 дня',
+        'Только в день праздника',
+      ],
+      correctIndex: 2,
+      explain:
+        'За 2 дня до 8 марта кривая заказов обгоняет «февральскую» — гости заранее заказывают столы и подарки.',
     },
   },
 ];

@@ -195,14 +195,17 @@ const interactables: Interactable[] = [
   // Courier-style station near the whiteboard — covers delivery time +
   // 60-minute promise.
   { id: 'dispatch', col: 2, row: 18, label: 'Доставка' },
-  // Two stations south of the big communal table — lower-left and
-  // lower-right floor tiles by the table's corners (table at col 11 row 11).
+  // Stations south of the big communal table (table at col 11 row 11):
+  // west / center / east floor tiles.
   { id: 'capitals', col: 10, row: 15, label: 'Москва и Петербург' },
+  { id: 'tile_map', col: 12, row: 15, label: 'Карты регионов' },
   { id: 'regions', col: 14, row: 15, label: 'Карта России' },
   // Dodster quiz — visualised by the burrito on the east side of the
   // big table. Player can approach from north, east, or the table's
   // top decorative row.
   { id: 'dodster', col: 13, row: 13, label: 'Додстеры' },
+  // Holiday ordering quiz — lower-right floor near the small table (19,16).
+  { id: 'holidays', col: 20, row: 15, label: 'Праздники' },
 ];
 
 // ── Characters ─────────────────────────────────────────────────────

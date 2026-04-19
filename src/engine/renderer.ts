@@ -99,30 +99,41 @@ export function renderFrame(
   }
 
   // Interactable highlights:
-  //  - Pending stations get a subtle pulsing yellow ring.
-  //  - Completed stations get a steady solid green ring with a pixel tick
-  //    drawn on top of the tile.
-  //  - The currently-active prompt (player adjacent) is brighter and ringed
-  //    a second time for emphasis.
+  //  - Most stations: yellow triangle (later) + pulsing yellow ring while pending.
+  //  - `dodster` on the communal table: no yellow (burrito sprite is the cue);
+  //    when in range, a subtle orange ring only; completed still uses green + tick.
+  //  - Completed stations: solid green ring + pixel tick.
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 350);
   for (const it of state.interactables) {
     const isActive = it.id === state.activePromptId;
     const isCompleted = state.completedStationIds.has(it.id);
-    const ringColor = isCompleted ? DODO_PALETTE.green : DODO_PALETTE.yellow;
-    ctx.strokeStyle = ringColor;
-    ctx.lineWidth = Math.max(2, ZOOM);
+    const isTableDodster = it.id === 'dodster';
+    const skipYellowDecor = isTableDodster && !isCompleted;
+
     if (isCompleted) {
+      ctx.strokeStyle = DODO_PALETTE.green;
+      ctx.lineWidth = Math.max(2, ZOOM);
       ctx.globalAlpha = isActive ? 0.95 : 0.7;
-    } else {
-      ctx.globalAlpha = isActive ? 0.55 + pulse * 0.45 : 0.18 + pulse * 0.18;
-    }
-    ctx.strokeRect(offsetX + it.col * s + 1, offsetY + it.row * s + 1, s - 2, s - 2);
-    if (isActive) {
-      ctx.globalAlpha = isCompleted ? 0.65 : 0.35 + pulse * 0.35;
-      ctx.strokeRect(offsetX + it.col * s - 2, offsetY + it.row * s - 2, s + 4, s + 4);
-    }
-    if (isCompleted) {
+      ctx.strokeRect(offsetX + it.col * s + 1, offsetY + it.row * s + 1, s - 2, s - 2);
+      if (isActive) {
+        ctx.globalAlpha = 0.65;
+        ctx.strokeRect(offsetX + it.col * s - 2, offsetY + it.row * s - 2, s + 4, s + 4);
+      }
       drawCompletedTick(ctx, offsetX + it.col * s, offsetY + it.row * s, s);
+    } else if (!skipYellowDecor) {
+      ctx.strokeStyle = DODO_PALETTE.yellow;
+      ctx.lineWidth = Math.max(2, ZOOM);
+      ctx.globalAlpha = isActive ? 0.55 + pulse * 0.45 : 0.18 + pulse * 0.18;
+      ctx.strokeRect(offsetX + it.col * s + 1, offsetY + it.row * s + 1, s - 2, s - 2);
+      if (isActive) {
+        ctx.globalAlpha = 0.35 + pulse * 0.35;
+        ctx.strokeRect(offsetX + it.col * s - 2, offsetY + it.row * s - 2, s + 4, s + 4);
+      }
+    } else if (isActive) {
+      ctx.strokeStyle = DODO_PALETTE.orange;
+      ctx.lineWidth = Math.max(2, ZOOM);
+      ctx.globalAlpha = 0.4 + pulse * 0.35;
+      ctx.strokeRect(offsetX + it.col * s + 1, offsetY + it.row * s + 1, s - 2, s - 2);
     }
   }
   ctx.globalAlpha = 1;
@@ -208,6 +219,15 @@ export function renderFrame(
 
   drawables.sort((a, b) => a.zY - b.zY);
   for (const d of drawables) d.draw();
+
+  // Yellow waypoint triangles above station tiles (after furniture). The
+  // table dodster tile is skipped — the burrito prop already marks the spot.
+  for (const it of state.interactables) {
+    if (it.id === 'dodster') continue;
+    const cx = offsetX + it.col * s + s / 2;
+    const cy = offsetY + it.row * s - 2 * ZOOM;
+    drawStationTriangleMarker(ctx, cx, cy);
+  }
 
   // Speech bubbles drawn on top in DOM-pixel space (still scaled by ZOOM).
   // Bubble anchor follows the character's *visual* head, accounting for the
@@ -308,6 +328,33 @@ function drawCompletedTick(
   ctx.fillRect(cx, cy, px, px);
   ctx.fillRect(cx + px, cy - px, px, px);
   ctx.fillRect(cx + px * 2, cy - px * 2, px, px);
+  ctx.restore();
+}
+
+/** Small down-pointing triangle above a station tile (corporate yellow + outline). */
+function drawStationTriangleMarker(ctx: CanvasRenderingContext2D, cx: number, cy: number): void {
+  const px = ZOOM;
+  const halfW = 5 * px;
+  const h = 5 * px;
+  const pad = px;
+  ctx.save();
+  ctx.translate(Math.round(cx), Math.round(cy));
+  // Outline
+  ctx.fillStyle = DODO_PALETTE.charcoal;
+  ctx.beginPath();
+  ctx.moveTo(-halfW - pad, -pad);
+  ctx.lineTo(halfW + pad, -pad);
+  ctx.lineTo(0, h + pad);
+  ctx.closePath();
+  ctx.fill();
+  // Fill
+  ctx.fillStyle = DODO_PALETTE.yellow;
+  ctx.beginPath();
+  ctx.moveTo(-halfW, 0);
+  ctx.lineTo(halfW, 0);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fill();
   ctx.restore();
 }
 
