@@ -20,6 +20,16 @@ export function EndingStory({ score, total, onRestart }: EndingStoryProps) {
           <div className="endingSpeaker">{verdict.speaker}:</div>
           <div className="endingText">{verdict.text}</div>
         </div>
+        <div className="endingCredits">
+          <div className="endingCreditsNames">
+            <div>Тимофей Атнашев</div>
+            <div>Михаил Бельведерский</div>
+            <div>Андрей Караваев</div>
+            <div>Илья Козицкий</div>
+            <div>Ромазан Самодинов</div>
+          </div>
+          <div className="endingCreditsTeam">Команда «Кермит»</div>
+        </div>
         <div className="endingActions">
           <button className="btn btnPrimary" onClick={onRestart}>
             Попробовать снова ▸
