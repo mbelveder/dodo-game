@@ -56,27 +56,17 @@ export function EndingStory({ score, total, onRestart }: EndingStoryProps) {
         </div>
         <div className="endingCredits">
           <div className="endingCreditsNames">
-            <div>
-              <a href="https://t.me/m_belveder" target="_blank" rel="noopener noreferrer">
-                Михаил Бельведерский
-              </a>
+            <div className="endingCreditsRow">
+              <a href="https://t.me/m_belveder" target="_blank" rel="noopener noreferrer">Михаил Бельведерский</a>
+              <a href="https://t.me/distant_notes" target="_blank" rel="noopener noreferrer">Тимофей Атнашев</a>
             </div>
-            <div>
-              <a href="https://t.me/distant_notes" target="_blank" rel="noopener noreferrer">
-                Тимофей Атнашев
-              </a>
+            <div className="endingCreditsRow">
+              <a href="https://t.me/xgerrr" target="_blank" rel="noopener noreferrer">Ромазан Самодинов</a>
+              <a href="https://t.me/batiushkaa2" target="_blank" rel="noopener noreferrer">Илья Козицкий</a>
             </div>
-            <div>
-              <a href="https://t.me/xgerrr" target="_blank" rel="noopener noreferrer">
-                Ромазан Самодинов
-              </a>
+            <div className="endingCreditsRow">
+              <span>Андрей Караваев</span>
             </div>
-            <div>
-              <a href="https://t.me/batiushkaa2" target="_blank" rel="noopener noreferrer">
-                Илья Козицкий
-              </a>
-            </div>
-            <div>Андрей Караваев</div>
           </div>
           <div className="endingCreditsTeam">Команда «Кермит»</div>
         </div>

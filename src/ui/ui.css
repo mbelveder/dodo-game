@@ -715,9 +715,15 @@ button:focus-visible {
 .endingCreditsNames {
   display: flex;
   flex-direction: column;
-  gap: 0.2em;
+  gap: 0.35em;
   margin-bottom: 0.55em;
   opacity: 0.92;
+}
+
+.endingCreditsRow {
+  display: flex;
+  justify-content: center;
+  gap: 1.2em;
 }
 
 .endingCreditsTeam {
