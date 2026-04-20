@@ -686,11 +686,11 @@ button:focus-visible {
 }
 
 .endingOutro {
-  font-size: clamp(22px, 2.8vw, 52px);
-  line-height: 1.55;
+  font-size: clamp(18px, 2.2vw, 42px);
+  line-height: 1.25;
   display: flex;
   flex-direction: column;
-  gap: 0.9em;
+  gap: 1em;
 }
 
 .endingOutro p {
@@ -699,10 +699,10 @@ button:focus-visible {
 
 .endingVerdict {
   border: 4px dashed var(--dodo-red);
-  padding: clamp(20px, 3vw, 36px);
+  padding: clamp(14px, 2vw, 28px);
   background: #fffaee;
-  font-size: clamp(28px, 3.8vw, 72px);
-  line-height: 1.35;
+  font-size: clamp(18px, 2.2vw, 42px);
+  line-height: 1.25;
 }
 
 .endingCredits {
