@@ -549,6 +549,62 @@ button:focus-visible {
   line-height: 1.5;
 }
 
+/* ── Disclaimer screen ─────────────────────────────────── */
+
+.disclaimerScreen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at center, rgba(255, 105, 0, 0.18), transparent 60%),
+    #1a1208;
+  padding: 24px;
+}
+
+.disclaimerCard {
+  width: min(820px, 96vw);
+  background: var(--dodo-cream);
+  color: var(--dodo-charcoal);
+  border: 4px solid var(--dodo-charcoal);
+  box-shadow:
+    0 0 0 4px var(--dodo-cream),
+    0 0 0 8px var(--dodo-charcoal),
+    12px 12px 0 8px rgba(0, 0, 0, 0.5);
+  padding: clamp(28px, 4vw, 52px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 2.5vw, 32px);
+}
+
+.disclaimerGreeting {
+  font-size: clamp(36px, 5vw, 80px);
+  letter-spacing: 0.04em;
+  color: var(--dodo-red);
+  text-align: center;
+}
+
+.disclaimerBody {
+  font-size: clamp(28px, 3.4vw, 56px);
+  line-height: 1.55;
+  text-align: center;
+  max-width: 72ch;
+}
+
+.disclaimerWish {
+  font-size: clamp(36px, 5vw, 80px);
+  text-align: center;
+  color: var(--dodo-orange);
+}
+
+.disclaimerCard .btn {
+  font-size: clamp(22px, 2.8vw, 48px);
+  padding: 14px 36px;
+  letter-spacing: 0.04em;
+}
+
 /* ── Ending screen ─────────────────────────────────────── */
 
 .endingScreen {
@@ -625,6 +681,18 @@ button:focus-visible {
   color: var(--dodo-red);
 }
 
+.endingOutro {
+  font-size: clamp(22px, 2.8vw, 52px);
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9em;
+}
+
+.endingOutro p {
+  margin: 0;
+}
+
 .endingVerdict {
   border: 4px dashed var(--dodo-red);
   padding: clamp(20px, 3vw, 36px);
@@ -664,6 +732,23 @@ button:focus-visible {
   font-size: clamp(26px, 3.2vw, 52px);
   padding: 16px 32px;
   letter-spacing: 0.04em;
+}
+
+.endingAttributions {
+  font-size: clamp(20px, 2.4vw, 40px);
+  opacity: 0.7;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.endingAttributions a {
+  color: var(--dodo-orange);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.endingAttributions a:hover {
+  color: var(--dodo-red);
 }
 
 .endingFooter {

@@ -18,7 +18,7 @@ import { InfographicModal } from './ui/InfographicModal';
 import { IntroCutscene } from './ui/IntroCutscene';
 import './ui/ui.css';
 
-type Stage = 'boot' | 'intro' | 'play' | 'ending';
+type Stage = 'boot' | 'disclaimer' | 'intro' | 'play' | 'ending';
 
 interface CompletedRecord {
   stationId: string;
@@ -45,7 +45,7 @@ export default function App() {
         buildSyntheticSprites();
         await loadFurnitureImages(getAllFurnitureRequests());
         setAssetsReady();
-        if (!cancelled) setStage('intro');
+        if (!cancelled) setStage('disclaimer');
       } catch (err) {
         console.error('Asset load failed', err);
       }
@@ -118,6 +118,28 @@ export default function App() {
       <div className="bootScreen">
         <div className="bootBrand">DODO</div>
         <div className="bootStatus">Загрузка пиццерии…</div>
+      </div>
+    );
+  }
+
+  if (stage === 'disclaimer') {
+    return (
+      <div className="disclaimerScreen">
+        <div className="disclaimerCard">
+          <div className="disclaimerGreeting">Привет!</div>
+          <div className="disclaimerBody">
+            То, что вы увидите на этом сайте, было создано в рамках хакатона ВШЭ
+            по журналистике данных 18–19 апреля 2026 года. На основе
+            предоставленного датасета нужно было найти и рассказать историю о
+            компании и её потребителях. Разработка и реализация концепции были
+            выполнены за 30 часов командой из пяти человек (авторы указаны в
+            титрах).
+          </div>
+          <div className="disclaimerWish">Желаем удачной игры!</div>
+          <button className="btn btnPrimary" onClick={() => setStage('intro')}>
+            Начать ▸
+          </button>
+        </div>
       </div>
     );
   }
